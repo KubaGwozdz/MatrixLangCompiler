@@ -14,6 +14,7 @@ res1 = 60.500;
 res2 = 60.;
 res3 = .500;
 res4 = 60.52E2;
+res5 = 50.a;
 str = "Hello world";
 
 if (m==n) {

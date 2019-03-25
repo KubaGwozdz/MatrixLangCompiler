@@ -110,7 +110,52 @@ def p_range_instr(p):
                    | ID ':' ID
                    | ID ':' INTNUM"""
 
-########################################DONE###########################################
+#TODO: done ^^^
+# matrix concept \/ \/ \/ \/
+
+def p_matrix(p):
+    """matrix : '[' body ']'"""
+    p[0] = [p[2]]
+
+
+def p_body(p):
+    '''body : row
+            | rows_with_brackets
+            | rows_with_semicolons'''
+    p[0] = p[1]
+
+
+def p_rows_with_brackets(p):
+    '''rows_with_brackes : '[' row ']'
+                         |'[' row ']' ',' rows'''
+    if len(p) == 4:
+        p[0] = p[2]
+    else:
+        p[5].append(p[2])
+        p[0] = p[5]
+
+
+def p_rows_with_semicolons(p):
+    '''rows_with_semicolons : row
+                            | row ';' rows'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[3].append(p[1])
+        p[0] = p[3]
+
+
+def p_row(p):
+    '''row : number
+           | number ',' row"""'''
+    if len(p) == 1:
+        p[0] = list()
+    elif len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[3].append(p[1])
+        p[0] = p[3]
+
 
 
 def p_factor_number(p):

@@ -6,11 +6,15 @@ import ply.yacc as yacc
 tokens = scanner.tokens
 
 precedence = (
-    # to fill ...
+    ("nonassoc", 'IF', 'ELSE'),
+    ("nonassoc", 'INCREMENT', 'DECREMENT'),
     ("right", '='),
     ("left", '+', '-'),
-    ("left", '*', '/')
-    # to fill ...
+    ("left", '*', '/'),
+    ("nonassoc", 'SMALLEREQ', 'GREATEREQ', 'NOTEQ', 'EQ'),
+    ("left", 'MATRIX_PLUS', 'MATRIX_MINUS'),
+    ("left", 'MATRIX_TIMES', 'MATRIX_DIVIDE')
+
 )
 
 
@@ -25,6 +29,7 @@ def p_program(p):
     """program : instructions_opt"""
 
 
+#------ instructions: ------
 def p_instructions_opt(p):
     """instructions_opt : instructions
                         | """
@@ -57,8 +62,8 @@ def p_instruction(p):
 
 
 def p_print_instr(p):
-    """print_instr : PRINT expression ';'"""
-    print(p[2])
+    """print_instr : PRINT expression """
+    #print(p[2])
 
 
 def p_if_instr(p):
@@ -101,7 +106,8 @@ def p_ones_instr(p):
 
 def p_assignment(p):                   #zapytac o range a = 1:3
     """assignment : ID '=' expression
-                  | ID '=' range"""
+                  | ID '=' range_instr
+                  | ID '=' matrix"""
 
 
 def p_range_instr(p):
@@ -109,53 +115,11 @@ def p_range_instr(p):
                    | INTNUM ':' ID
                    | ID ':' ID
                    | ID ':' INTNUM"""
-
-#TODO: done ^^^
-# matrix concept \/ \/ \/ \/
-
-def p_matrix(p):
-    """matrix : '[' body ']'"""
-    p[0] = [p[2]]
+def p_condition(p):
+    """condition :  expression"""
 
 
-def p_body(p):
-    '''body : row
-            | rows_with_brackets
-            | rows_with_semicolons'''
-    p[0] = p[1]
-
-
-def p_rows_with_brackets(p):
-    '''rows_with_brackes : '[' row ']'
-                         |'[' row ']' ',' rows'''
-    if len(p) == 4:
-        p[0] = p[2]
-    else:
-        p[5].append(p[2])
-        p[0] = p[5]
-
-
-def p_rows_with_semicolons(p):
-    '''rows_with_semicolons : row
-                            | row ';' rows'''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[3].append(p[1])
-        p[0] = p[3]
-
-
-def p_row(p):
-    '''row : number
-           | number ',' row"""'''
-    if len(p) == 1:
-        p[0] = list()
-    elif len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[3].append(p[1])
-        p[0] = p[3]
-
+#------ expressions: ------
 
 
 def p_factor_number(p):
@@ -166,22 +130,21 @@ def p_factor_number(p):
 
 def p_factor_string(p):
     """factor : STRING """
-    p[0] = p[2]
+    p[0] = p[1]
 
 
 def p_factor_id(p):
     """factor : ID"""
     p[0] = p[1]
 
+def p_expression_group(p):
+    """expression : '(' expression ')'"""
+    p[0] = p[2]
+
 
 def p_expression_assignment(p):
     """expression : ID '=' expression"""
     p[0] = p[3]
-
-
-def p_expression_group(p):
-    """expression : '(' expression ')'"""
-    p[0] = p[2]
 
 
 def p_binary_operators(p):
@@ -204,12 +167,67 @@ def p_binary_operators(p):
             p[0] = p[1] / p[3]
 
 
-def p_matrix_operators(p):
-    ''''''
+
+#------ matrix parse: ------
+
+def p_matrix(p):
+    """matrix : '[' body ']'"""
+    p[0] = [p[2]]
 
 
-# to finish the grammar
-# ....
+def p_body(p):
+    '''body : row
+            | rows_with_brackets
+            | rows_with_semicolons'''
+    p[0] = p[1]
 
 
-parser = yacc.yacc()
+def p_rows_with_brackets(p):
+    '''rows_with_brackets : '[' row ']'
+                         | '[' row ']' ',' rows_with_brackets'''
+    if len(p) == 4:
+        p[0] = p[2]
+    else:
+        p[5].append(p[2])
+        p[0] = p[5]
+
+
+def p_rows_with_semicolons(p):
+    '''rows_with_semicolons : row
+                            | row ';' rows_with_semicolons'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[3].append(p[1])
+        p[0] = p[3]
+
+
+def p_row(p):
+    '''row : NUMBER
+           | NUMBER ',' row '''
+    if len(p) == 1:
+        p[0] = list()
+    elif len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[3].append(p[1])
+        p[0] = p[3]
+
+
+def p_number(p):
+    """NUMBER : INTNUM
+              | FLOATNUM"""
+
+#------ matrix operations: ------
+
+
+def p_matrix_matrix_operations(p):
+    '''m_expr : matrix MATRIX_PLUS matrix
+              | matrix MATRIX_MINUS matrix
+              | matrix MATRIX_TIMES matrix
+              | matrix MATRIX_DIVIDE matrix'''
+
+
+
+
+parser = yacc.yacc(start='program')

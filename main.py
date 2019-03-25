@@ -1,6 +1,7 @@
 import sys
 import ply.lex as lex
 import scanner  # scanner.py is a file you create, (it is not an external library)
+import Mparser as parser
 
 if __name__ == '__main__':
 
@@ -14,6 +15,8 @@ if __name__ == '__main__':
     text = file.read()
     lexer = scanner.lexer
     lexer.input(text)  # Give the lexer some input
+    par = parser.parser
+    par.parse(text,lexer=lexer)
 
     # Tokenize
     while True:

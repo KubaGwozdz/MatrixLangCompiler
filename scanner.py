@@ -19,11 +19,11 @@ reserved = {
 }
 
 tokens = [] + \
-         [ 'FLOATNUM', 'DEFFLOATNUM', 'INTNUM', 'ID',
-           'MATRIX_PLUS', 'MATRIX_MINUS', 'MATRIX_TIMES', 'MATRIX_DIVIDE',
+         ['MATRIX_PLUS', 'MATRIX_MINUS', 'MATRIX_TIMES', 'MATRIX_DIVIDE',
            'INCREMENT', 'DECREMENT',
            'MULTIPLY', 'DIVIDE',
-           'SMALLEREQ', 'GREATEREQ', 'NOTEQ', 'EQ', 'STRING'] + list(reserved.values())
+           'SMALLEREQ', 'GREATEREQ', 'NOTEQ', 'EQ',
+          'FLOATNUM', 'INTNUM', 'ID', 'STRING'] + list(reserved.values())
 
 t_MATRIX_PLUS    = r'\.\+'
 t_MATRIX_MINUS   = r'\.\-'
@@ -43,15 +43,9 @@ literals = "+-*/()[]{}=:',;<>"
 
 # [0-9]+.[0-9]+
 def t_FLOATNUM(t):
-    r'\d+\.\d+([eE]\d+)?'
+    r'\d*((\d\.|\.\d)\d*([Ee][+-]?\d+)?|\d([Ee][+-]?\d+))'
     t.value = float(t.value)
     return t
-
-def t_DEFFLOATNUM(t):
-    r'\d+\.'
-    t.value = float(t.value)
-    return t
-
 
 # [0-9]+
 def t_INTNUM(t):
@@ -61,12 +55,12 @@ def t_INTNUM(t):
 
 # "whatever 123"
 def t_STRING(t):
-    r'".+"'
+    r'".+?"'        #[^\"]+
     return t
 
 # begnis with a letter or _ (_123whatever | whatever)
 def t_ID(t):
-    r'[a-zA-Z][a-zA-Z_0-9]*|_[a-zA-Z0-9]\w*'
+    r'[_a-zA-Z]\w*'
     t.type = reserved.get(t.value,'ID')
     return t
 
@@ -80,11 +74,8 @@ def t_newline(t):
 
 
 def t_error(t) :
-    pos = 0
-    while (t.value[pos]!=';'):
-        pos += 1
-    print("Illegal character ", t.value[0:pos])
-    t.lexer.skip(pos)
+    print("Illegal character ", t.value[0])
+    t.lexer.skip(1)
 
 
 # Compute column.

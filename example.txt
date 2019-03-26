@@ -17,7 +17,7 @@ res4 = 60.52E2;
 res5 = 50.a;
 str = "Hello world";
 
-if (m==n) {   "ccc"
+if (m==n) {
     if (m >= n)
         print res;
 }

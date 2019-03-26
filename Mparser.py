@@ -53,17 +53,22 @@ def p_instruction(p):
                    | break_instr
                    | cont_instr
                    | return_instr
-                   | eye_instr
-                   | zeros_instr
-                   | ones_instr
                    | assignment
                    | range_instr"""
     p[0] = p[1]
 
 
 def p_print_instr(p):
-    """print_instr : PRINT expression """
+    """print_instr : PRINT expression ';'
+                   | PRINT ID ';'
+                   | PRINT STRING ';'
+                   | PRINT multi_print ';'"""
     #print(p[2])
+
+
+def p_multi_print(p):
+    """multi_print : expression ',' multi_print
+                   | expression"""
 
 
 def p_if_instr(p):
@@ -73,7 +78,7 @@ def p_if_instr(p):
 
 
 def p_for_instr(p):
-    """for_instr : FOR assignment instr_opt"""
+    """for_instr : FOR ID '=' range_instr instr_opt"""
 
 
 def p_while_instr(p):
@@ -81,15 +86,15 @@ def p_while_instr(p):
 
 
 def p_break_instr(p):
-    """break_instr : BREAK"""
+    """break_instr : BREAK ';' """
 
 
 def p_cont_instr(p):
-    """cont_instr : CONTINUE"""
+    """cont_instr : CONTINUE ';' """
 
 
 def p_return_instr(p):
-    """return_instr : RETURN factor"""
+    """return_instr : RETURN factor ';'"""
 
 
 def p_eye_instr(p):
@@ -97,17 +102,27 @@ def p_eye_instr(p):
 
 
 def p_zeros_instr(p):
-    """zeros_instr : ZEROS '(' INTNUM ')'"""
+    """zeros_instr : ZEROS '(' INTNUM ')' """
 
 
 def p_ones_instr(p):
-    """ones_instr : ONES '(' INTNUM ')'"""
+    """ones_instr : ONES '(' INTNUM ')' """
 
 
 def p_assignment(p):                   #zapytac o range a = 1:3
-    """assignment : ID '=' expression
-                  | ID '=' range_instr
-                  | ID '=' matrix"""
+    """assignment : ID '=' expression ';'
+                  | ID '=' NUMBER ';'
+                  | ID '=' range_instr ';'
+                  | ID '=' matrix ';'
+                  | ID '=' STRING ';'
+                  | ID DECREMENT expression ';'
+                  | ID INCREMENT expression ';'
+                  | ID DIVIDE expression ';'
+                  | ID MULTIPLY expression ';'
+                  | ID '=' eye_instr ';'
+                  | ID '=' zeros_instr ';'
+                  | ID '=' ones_instr ';'
+                  | ID '[' INTNUM ',' INTNUM ']' '=' NUMBER ';' """
 
 
 def p_range_instr(p):
@@ -115,64 +130,66 @@ def p_range_instr(p):
                    | INTNUM ':' ID
                    | ID ':' ID
                    | ID ':' INTNUM"""
+
+
 def p_condition(p):
-    """condition :  expression"""
+    """condition : expression EQ expression
+                 | expression NOTEQ expression
+                 | expression GREATEREQ expression
+                 | expression SMALLEREQ expression
+                 | expression '>' expression
+                 | expression '<' expression"""
+
+
+def p_cond_par(p):
+    """cond_par : INTNUM
+                | FLOATNUM
+                | ID"""
+
 
 
 #------ expressions: ------
-
-
-def p_factor_number(p):
-    """factor : INTNUM
-              | FLOATNUM"""
-    p[0] = p[1]
-
-
-def p_factor_string(p):
-    """factor : STRING """
-    p[0] = p[1]
-
-
-def p_factor_id(p):
-    """factor : ID"""
-    p[0] = p[1]
 
 def p_expression_group(p):
     """expression : '(' expression ')'"""
     p[0] = p[2]
 
 
-def p_expression_assignment(p):
-    """expression : ID '=' expression"""
-    p[0] = p[3]
-
-
 def p_binary_operators(p):
-    '''expression : expression '+' term
-                  | expression '-' term
-                  | '-' expression
-       term       : term '*' factor
-                  | term '/' factor'''
+    """ expression : expression '+' expression
+                   | expression '-' expression
+                   | expression '*' expression
+                   | expression '/' expression
+                   | cond_par
+                   | '-' expression
+                   | m_expr"""
 
-    if len(p) == 3:
-        p[0] = -p[2]
-    else:
-        if p[2] == '+':
-            p[0] = p[1] + p[3]
-        elif p[2] == '-':
-            p[0] = p[1] - p[3]
-        elif p[2] == '*':
-            p[0] = p[1] * p[3]
-        elif p[2] == '/':
-            p[0] = p[1] / p[3]
+
+def p_factor_number(p):
+    """factor : cond_par"""
+    p[0] = p[1]
+
+
+def p_factor_expr(p):
+    """factor : '(' expression ')' """
+    p[0] = p[2]
 
 
 
 #------ matrix parse: ------
 
 def p_matrix(p):
-    """matrix : '[' body ']'"""
-    p[0] = [p[2]]
+    """matrix : '[' body ']'
+              | matrix_transp
+              | ID"""
+    if len(p) == 4:
+        p[0] = [p[2]]
+    else:
+        p[0] = p[1]
+
+
+def p_matrix_transp(p):
+    """matrix_transp : matrix "'" """
 
 
 def p_body(p):
@@ -185,48 +202,31 @@ def p_body(p):
 def p_rows_with_brackets(p):
     '''rows_with_brackets : '[' row ']'
                          | '[' row ']' ',' rows_with_brackets'''
-    if len(p) == 4:
-        p[0] = p[2]
-    else:
-        p[5].append(p[2])
-        p[0] = p[5]
 
 
 def p_rows_with_semicolons(p):
     '''rows_with_semicolons : row
                             | row ';' rows_with_semicolons'''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[3].append(p[1])
-        p[0] = p[3]
 
 
 def p_row(p):
-    '''row : NUMBER
-           | NUMBER ',' row '''
-    if len(p) == 1:
-        p[0] = list()
-    elif len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[3].append(p[1])
-        p[0] = p[3]
+    """row : NUMBER
+           | NUMBER ',' row """
 
 
 def p_number(p):
     """NUMBER : INTNUM
               | FLOATNUM"""
 
-#------ matrix operations: ------
 
+
+#------ matrix operations: ------
 
 def p_matrix_matrix_operations(p):
     '''m_expr : matrix MATRIX_PLUS matrix
               | matrix MATRIX_MINUS matrix
               | matrix MATRIX_TIMES matrix
               | matrix MATRIX_DIVIDE matrix'''
-
 
 
 

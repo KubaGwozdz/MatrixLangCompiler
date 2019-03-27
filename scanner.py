@@ -42,6 +42,7 @@ t_EQ             = r'=='
 literals = "+-*/()[]{}=:',;<>"
 
 # [0-9]+.[0-9]+
+#\d+\.\d*|.\d+
 def t_FLOATNUM(t):
     r'\d*((\d\.|\.\d)\d*([Ee][+-]?\d+)?|\d([Ee][+-]?\d+))'
     t.value = float(t.value)

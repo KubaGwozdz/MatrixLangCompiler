@@ -6,13 +6,14 @@ import ply.yacc as yacc
 tokens = scanner.tokens
 
 precedence = (
-    ("nonassoc", 'IF', 'ELSE'),
-    ("nonassoc", 'INCREMENT', 'DECREMENT'),
+    ("nonassoc", 'IF'),
+    ("nonassoc", 'ELSE'),
+    ("nonassoc", 'INCREMENT', 'DECREMENT', 'MULTIPLY', 'DIVIDE'), #zmienic nazewnictwo
     ("right", '='),
-    ("left", '+', '-'),
-    ("left", '*', '/'),
     ("nonassoc", 'SMALLEREQ', 'GREATEREQ', 'NOTEQ', 'EQ'),
+    ("left", '+', '-'),
     ("left", 'MATRIX_PLUS', 'MATRIX_MINUS'),
+    ("left", '*', '/'),
     ("left", 'MATRIX_TIMES', 'MATRIX_DIVIDE')
 
 )
@@ -55,13 +56,12 @@ def p_instruction(p):
                    | return_instr
                    | assignment
                    | range_instr"""
+    # { instruction(s) } bez funkcji ok
     p[0] = p[1]
 
 
 def p_print_instr(p):
     """print_instr : PRINT expression ';'
-                   | PRINT ID ';'
-                   | PRINT STRING ';'
                    | PRINT multi_print ';'"""
     #print(p[2])
 
@@ -109,12 +109,9 @@ def p_ones_instr(p):
     """ones_instr : ONES '(' INTNUM ')' """
 
 
-def p_assignment(p):                   #zapytac o range a = 1:3
+def p_assignment(p):                   #zapytac o range a = 1:3 - nie powinno byc mozliwe
     """assignment : ID '=' expression ';'
-                  | ID '=' NUMBER ';'
-                  | ID '=' range_instr ';'
                   | ID '=' matrix ';'
-                  | ID '=' STRING ';'
                   | ID DECREMENT expression ';'
                   | ID INCREMENT expression ';'
                   | ID DIVIDE expression ';'
@@ -123,9 +120,11 @@ def p_assignment(p):                   #zapytac o range a = 1:3
                   | ID '=' zeros_instr ';'
                   | ID '=' ones_instr ';'
                   | ID '[' INTNUM ',' INTNUM ']' '=' NUMBER ';' """
+    # inne opearatory przypisania tez ok
+    # eye,zeros,ones do expression
 
 
-def p_range_instr(p):
+def p_range_instr(p): # var_or_id -> var\ id
     """range_instr : INTNUM ':' INTNUM
                    | INTNUM ':' ID
                    | ID ':' ID
@@ -144,7 +143,8 @@ def p_condition(p):
 def p_cond_par(p):
     """cond_par : INTNUM
                 | FLOATNUM
-                | ID"""
+                | ID
+                | matrix"""
 
 
 
@@ -162,7 +162,8 @@ def p_binary_operators(p):
                    | expression '/' expression
                    | cond_par
                    | '-' expression
-                   | m_expr"""
+                   | m_expr
+                   | STRING"""
 
 
 def p_factor_number(p):
@@ -222,7 +223,7 @@ def p_number(p):
 
 #------ matrix operations: ------
 
-def p_matrix_matrix_operations(p):
+def p_matrix_matrix_operations(p): #zamiast matrix expression
     '''m_expr : matrix MATRIX_PLUS matrix
               | matrix MATRIX_MINUS matrix
               | matrix MATRIX_TIMES matrix

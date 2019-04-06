@@ -2,11 +2,30 @@ import sys
 import ply.lex as lex
 import scanner  # scanner.py is a file you create, (it is not an external library)
 import Mparser as parser
+import ply.yacc as yacc
+from TreePrinter import TreePrinter
+
 
 if __name__ == '__main__':
 
     try:
-        filename = sys.argv[1] if len(sys.argv) > 1 else "example2.txt"
+        filename = sys.argv[1] if len(sys.argv) > 1 else "example.txt"
+        file = open(filename, "r")
+    except IOError:
+        print("Cannot open {0} file".format(filename))
+        sys.exit(0)
+
+    Mparser = parser.parser
+    text = file.read()
+    ast = Mparser.parse(text, lexer=Mparser.scanner)
+    ast.printTree()
+
+
+"""
+if __name__ == '__main__':
+
+    try:
+        filename = sys.argv[1] if len(sys.argv) > 1 else "example3.txt"
         file = open(filename, "r")
     except IOError:
         print("Cannot open {0} file".format(filename))
@@ -25,4 +44,4 @@ if __name__ == '__main__':
             break  # No more input
         column = scanner.find_column(text, tok)
         print("(%d,%d): %s (%s)" % (tok.lineno, column, tok.type, tok.value))
-
+"""

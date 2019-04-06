@@ -2,13 +2,14 @@
 
 import scanner
 import ply.yacc as yacc
+import AST
 
 tokens = scanner.tokens
 
 precedence = (
     ("nonassoc", 'IF'),
     ("nonassoc", 'ELSE'),
-    ("nonassoc", 'INCREMENT', 'DECREMENT', 'MULTIPLY', 'DIVIDE'), #zmienic nazewnictwo
+    ("nonassoc", 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
     ("right", '='),
     ("nonassoc", 'SMALLEREQ', 'GREATEREQ', 'NOTEQ', 'EQ'),
     ("left", '+', '-'),
@@ -28,12 +29,14 @@ def p_error(p):
 
 def p_program(p):
     """program : instructions_opt"""
+    p[0] = p[1]
 
 
 #------ instructions: ------
 def p_instructions_opt(p):
     """instructions_opt : instructions
                         | """
+    p[0] = p[1]
 
 
 def p_instructions(p):
@@ -55,46 +58,65 @@ def p_instruction(p):
                    | cont_instr
                    | return_instr
                    | assignment
-                   | range_instr"""
-    # { instruction(s) } bez funkcji ok
-    p[0] = p[1]
+                   | range_instr
+                   | '{' instructions '}' """
+    if(p[1] == '{'):
+        expr = p[2]
+        p[0] = AST.CompoundInstr(expr)
+    else:
+        p[0] = p[1]
 
 
 def p_print_instr(p):
     """print_instr : PRINT expression ';'
                    | PRINT multi_print ';'"""
-    #print(p[2])
+    p[0] = AST.PrintInstr(p[2])
+
 
 
 def p_multi_print(p):
     """multi_print : expression ',' multi_print
                    | expression"""
+    if(len(p) > 2):
+        p[0] = p[1].append(p[3])
+    else:
+        p[0] = p[1]
 
 
 def p_if_instr(p):
     """if_instr  : IF  '(' condition ')' instr_opt
                  | IF  '(' condition ')' instr_opt ELSE if_instr
                  | IF  '(' condition ')' instr_opt ELSE instr_opt"""
+    if(len(p) > 6):
+        p[0] = AST.IfInstr(p[3], p[5], p[7])
+    else:
+        p[0] = AST.IfInstr(p[3], p[5])
 
 
 def p_for_instr(p):
     """for_instr : FOR ID '=' range_instr instr_opt"""
+    p[0] = AST.ForInstr(p[2], p[4], p[5])
+
 
 
 def p_while_instr(p):
     """while_instr : WHILE '(' condition ')' instr_opt"""
+    p[0] = AST.WhileInstr(p[3], p[5])
 
 
 def p_break_instr(p):
     """break_instr : BREAK ';' """
+    p[0] = AST.BreakInstr()
 
 
 def p_cont_instr(p):
     """cont_instr : CONTINUE ';' """
+    p[0] = AST.ContinueInstr()
 
 
 def p_return_instr(p):
-    """return_instr : RETURN factor ';'"""
+    """return_instr : RETURN expression ';'"""
+    p[0] = AST.ReturnInstr(p[2])
 
 
 def p_eye_instr(p):
@@ -109,19 +131,18 @@ def p_ones_instr(p):
     """ones_instr : ONES '(' INTNUM ')' """
 
 
-def p_assignment(p):                   #zapytac o range a = 1:3 - nie powinno byc mozliwe
-    """assignment : ID '=' expression ';'
-                  | ID '=' matrix ';'
-                  | ID DECREMENT expression ';'
-                  | ID INCREMENT expression ';'
-                  | ID DIVIDE expression ';'
-                  | ID MULTIPLY expression ';'
-                  | ID '=' eye_instr ';'
-                  | ID '=' zeros_instr ';'
-                  | ID '=' ones_instr ';'
-                  | ID '[' INTNUM ',' INTNUM ']' '=' NUMBER ';' """
-    # inne opearatory przypisania tez ok
-    # eye,zeros,ones do expression
+def p_assignment(p):
+    """assignment : ID assign_ops matrix ';'
+                  | ID assign_ops expression ';'
+                  | ID '[' INTNUM ',' INTNUM ']' assign_ops NUMBER ';' """
+
+
+def p_assign_ops(p):
+    """assign_ops : SUBASSIGN
+                  | ADDASSIGN
+                  | DIVASSIGN
+                  | MULASSIGN
+                  | '=' """
 
 
 def p_range_instr(p): # var_or_id -> var\ id
@@ -163,7 +184,10 @@ def p_binary_operators(p):
                    | cond_par
                    | '-' expression
                    | m_expr
-                   | STRING"""
+                   | STRING
+                   | ones_instr
+                   | zeros_instr
+                   | eye_instr """
 
 
 def p_factor_number(p):

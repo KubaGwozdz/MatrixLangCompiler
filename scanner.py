@@ -20,8 +20,8 @@ reserved = {
 
 tokens = [] + \
          ['MATRIX_PLUS', 'MATRIX_MINUS', 'MATRIX_TIMES', 'MATRIX_DIVIDE',
-           'INCREMENT', 'DECREMENT',
-           'MULTIPLY', 'DIVIDE',
+           'ADDASSIGN', 'SUBASSIGN',
+           'DIVASSIGN', 'MULASSIGN',
            'SMALLEREQ', 'GREATEREQ', 'NOTEQ', 'EQ',
           'FLOATNUM', 'INTNUM', 'ID', 'STRING'] + list(reserved.values())
 
@@ -29,10 +29,10 @@ t_MATRIX_PLUS    = r'\.\+'
 t_MATRIX_MINUS   = r'\.\-'
 t_MATRIX_TIMES   = r'\.\*'
 t_MATRIX_DIVIDE  = r'\.\/'
-t_INCREMENT      = r'\+='
-t_DECREMENT      = r'\-='
-t_MULTIPLY       = r'\*='
-t_DIVIDE         = r'/='
+t_ADDASSIGN      = r'\+='
+t_SUBASSIGN      = r'\-='
+t_MULASSIGN      = r'\*='
+t_DIVASSIGN      = r'/='
 t_SMALLEREQ      = r'<='
 t_GREATEREQ      = r'>='
 t_NOTEQ          = r'!='

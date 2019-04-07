@@ -102,6 +102,7 @@ class Mparser(object):
 
     def p_if_instr(self, p):
         """if_instr  : IF  '(' condition ')' instr_opt
+                     | IF '(' condition ')' if_instr
                      | IF  '(' condition ')' instr_opt ELSE if_instr
                      | IF  '(' condition ')' instr_opt ELSE instr_opt"""
         if(len(p) > 6):
@@ -220,7 +221,7 @@ class Mparser(object):
         if(len(p) == 4):
             p[0] = AST.BinExpr(p[2], p[1], p[3])
         elif(len(p) == 3):
-            p[0] = p[2] #TODO: jak zanegowac?
+            p[0] = -p[2] #TODO: jak zanegowac?
         else:
             p[0] = p[1]
 

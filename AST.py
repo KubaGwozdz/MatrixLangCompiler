@@ -37,6 +37,7 @@ class BinExpr(Node):
         self.left = left
         self.right = right
 
+
 class RelExpr(Node):
     def __init__(self, op, left, right):
         self.op = op
@@ -146,8 +147,6 @@ class Matrix_bin_ops(Node):
         self.left = left
         self.op = op
         self.right = right
-
-
 
 
 class Error(Node):

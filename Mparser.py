@@ -9,6 +9,7 @@ class Mparser(object):
         self.scanner = Scanner()
         self.scanner.build()
 
+
     tokens = Scanner.tokens
 
     precedence = (
@@ -36,6 +37,7 @@ class Mparser(object):
 
     def p_program(self, p):
         """program : instructions_opt"""
+        p[0] = AST.Program(p[1])
         print(AST.Program(p[1]))
 
 
@@ -194,7 +196,13 @@ class Mparser(object):
                     | FLOATNUM
                     | ID
                     | matrix"""
-        p[0] = p[1]
+        if(isinstance(p[0], int)):
+            p[0] = AST.IntNum(p[1])
+        elif(isinstance(p[0], float)):
+            p[0] = AST.FloatNum(p[1])
+        elif(isinstance(p[0], str)):
+            p[0] = AST.Variable(p[0])
+
 
 
 

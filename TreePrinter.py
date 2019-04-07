@@ -23,6 +23,7 @@ class TreePrinter:
         for i in self.instructions:
             ret += i.printTree(0)
         return ret
+        #return self.instructions[0].printTree(indent + 1)
 
     @addToClass(AST.IntNum)
     def printTree(self, indent=0):
@@ -46,7 +47,8 @@ class TreePrinter:
 
     @addToClass(AST.AssInstr)
     def printTree(self, indent=0):
-        return INDENT_TOKEN * indent + self.op + "\n" + self.left.printTree(indent + 1) + self.right.printTree(indent + 1)
+        #return INDENT_TOKEN * indent + self.op + "\n" + self.left.printTree(indent + 1) + self.right.printTree(indent + 1)
+        return INDENT_TOKEN * indent + self.op + "\n" + str(self.left) + str(self.right)
 
     @addToClass(AST.AssTabInstr)
     def printTree(self, indent=0):

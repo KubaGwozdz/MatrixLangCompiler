@@ -194,13 +194,12 @@ class Mparser(object):
     def p_cond_par(self, p):
         """cond_par : INTNUM
                     | FLOATNUM
-                    | ID
-                    | matrix"""
-        if(isinstance(p[0], int)):
+                    | ID"""
+        if(isinstance(p[1], int)):
             p[0] = AST.IntNum(p[1])
-        elif(isinstance(p[0], float)):
+        elif(isinstance(p[1], float)):
             p[0] = AST.FloatNum(p[1])
-        elif(isinstance(p[0], str)):
+        elif(isinstance(p[1], str)):
             p[0] = AST.Variable(p[0])
 
 
@@ -221,6 +220,7 @@ class Mparser(object):
                        | cond_par
                        | '-' expression
                        | m_expr
+                       | matrix
                        | STRING
                        | ones_instr
                        | zeros_instr
@@ -300,7 +300,11 @@ class Mparser(object):
     def p_number(self, p):
         """NUMBER : INTNUM
                   | FLOATNUM"""
-        p[0] = p[1]
+        print(type(p[1]))
+        if(isinstance(p[1], int)):
+            p[0] = AST.IntNum(p[1])
+        else:
+            p[0] = AST.FloatNum(p[1])
 
 
 

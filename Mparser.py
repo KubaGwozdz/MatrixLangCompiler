@@ -9,7 +9,6 @@ class Mparser(object):
         self.scanner = Scanner()
         self.scanner.build()
 
-
     tokens = Scanner.tokens
 
     precedence = (
@@ -37,7 +36,7 @@ class Mparser(object):
 
     def p_program(self, p):
         """program : instructions_opt"""
-        print (AST.Program(p[1]))
+        print(AST.Program(p[1]))
 
 
     #------ instructions: ------

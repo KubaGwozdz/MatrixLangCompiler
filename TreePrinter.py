@@ -19,7 +19,10 @@ class TreePrinter:
 
     @addToClass(AST.InstructionList)
     def printTree(self, indent=0):
-        pass
+        ret = ""
+        for i in self.instructions:
+            ret += i.printTree(0)
+        return ret
 
     @addToClass(AST.IntNum)
     def printTree(self, indent=0):

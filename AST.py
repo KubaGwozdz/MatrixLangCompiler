@@ -1,5 +1,6 @@
 class Node(object):
-    pass
+    def __str__(self):
+        return self.printTree()
 
 
 class IntNum(Node):
@@ -37,6 +38,28 @@ class AssInstr(Node):
         self.right = right
 
 
+class AssTabInstr(Node):
+    def __init__(self, op, left, frm, to, right):
+        self.op = op
+        self.left = left
+        self.frm = frm
+        self.to = to
+        self.right = right
+
+
+class RangeInstr(Node):
+    def __init__(self, frm, to):
+        self.frm = frm
+        self.to = to
+
+
+class CondInstr(Node):
+    def __init__(self, expr_l, op, expr_r):
+        self.expr_l = expr_l
+        self.expr_r = expr_r
+        self.op = op
+
+
 class IfInstr(Node):
     def __init__(self, cond, instr1, instr2 = None):
         self.cond = cond
@@ -48,6 +71,7 @@ class WhileInstr(Node):
     def __init__(self, cond, instr):
         self.cond = cond
         self.instr = instr
+
 
 class ForInstr(Node):
     def __init__(self, id, range, instr):
@@ -75,23 +99,46 @@ class PrintInstr(Node):
 
 
 class CompoundInstr(Node):
-    def __index__(self, instr):
+    def __init__(self, instr):
         self.instr = instr
 
 
+class EyeInstr(Node):
+    def __init__(self, intnum):
+        self.intnum = intnum
+
+
+class ZerosInstr(Node):
+    def __init__(self, intnum):
+        self.intnum = intnum
+
+
+class OnesInstr(Node):
+    def __init__(self, intnum):
+        self.intnum = intnum
+
+
 class Matrix(Node):
-    def __init__(self):
-        self.rows = []
-
-    def add_row(self, row):
-        self.rows.append(row)
+    def __init__(self, body):
+        self.body = body
 
 
+class MatrixTransp(Node):
+    def __init__(self, matrix):
+        self.matrix = matrix
 
-# ...
-# fill out missing classes
-# ...
+
+class Matrix_bin_ops(Node):
+    def __init__(self, left, op, right):
+        self.left = left
+        self.op = op
+        self.right = right
+
+
+
 
 class Error(Node):
-    def __init__(self):
-        pass
+    def __init__(self, lineno=None, type=None, value=None):
+        self.lineno = lineno
+        self.type = type
+        self.value = value

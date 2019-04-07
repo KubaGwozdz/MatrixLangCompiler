@@ -46,6 +46,9 @@ class TreePrinter:
 
 
 
+    @addToClass(AST.Program)
+    def printTree(self, indent=0):
+        return self.instructions.printTree(indent+1)
 
 
     @addToClass(AST.Error)

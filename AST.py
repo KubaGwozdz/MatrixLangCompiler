@@ -3,6 +3,19 @@ class Node(object):
         return self.printTree()
 
 
+class Program(Node):
+    def __init__(self, instructions):
+        self.instructions = instructions
+
+
+class InstructionList(Node):
+    def __init__(self):
+        self.instructions = []
+
+    def add_instruction(self, instr):
+        self.instructions.append(instr)
+
+
 class IntNum(Node):
     def __init__(self, value):
         self.value = value

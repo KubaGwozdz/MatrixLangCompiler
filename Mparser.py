@@ -1,9 +1,6 @@
 #!/usr/bin/python
-
 from scanner import Scanner
-import ply.yacc as yacc
 import AST
-import TreePrinter
 
 
 class Mparser(object):
@@ -40,7 +37,7 @@ class Mparser(object):
 
     def p_program(self, p):
         """program : instructions_opt"""
-        p[0] = p[1]
+        print (AST.Program(p[1]))
 
 
     #------ instructions: ------
@@ -53,11 +50,20 @@ class Mparser(object):
     def p_instructions(self, p):
         """instructions : instructions instruction
                         | instruction """
+        if len(p) == 3:
+            p[0] = AST.InstructionList() if p[1] is None else p[1]
+            p[0].add_instruction(p[2])
+        else:
+            p[0] = AST.InstructionList()
 
 
     def p_instr_opt(self, p):
         """instr_opt : '{' instructions '}'
                      | instruction"""
+        if len(p) == 2:
+            p[0] = p[1]
+        else:
+            p[0] = p[2]
 
 
     def p_instruction(self, p):
@@ -89,7 +95,7 @@ class Mparser(object):
         """multi_print : expression ',' multi_print
                        | expression"""
         if(len(p) > 2):
-            p[0] = p[1].append(p[3])
+            p[0] = p[1] + p[3]
         else:
             p[0] = p[1]
 
@@ -170,7 +176,7 @@ class Mparser(object):
                        | INTNUM ':' ID
                        | ID ':' ID
                        | ID ':' INTNUM"""
-        p[0] = AST.ReturnInstr(p[1], p[3])
+        p[0] = AST.RangeInstr(p[1], p[3])
 
 
     def p_condition(self, p):
@@ -214,7 +220,7 @@ class Mparser(object):
         if(len(p) == 4):
             p[0] = AST.BinExpr(p[2], p[1], p[3])
         elif(len(p) == 3):
-            p[0] = -p[2]
+            p[0] = p[2] #TODO: jak zanegowac?
         else:
             p[0] = p[1]
 

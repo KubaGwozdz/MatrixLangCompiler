@@ -56,6 +56,7 @@ class Mparser(object):
             p[0].add_instruction(p[2])
         else:
             p[0] = AST.InstructionList()
+            p[0].add_instruction(p[1])
 
 
     def p_instr_opt(self, p):
@@ -86,20 +87,21 @@ class Mparser(object):
 
 
     def p_print_instr(self, p):
-        """print_instr : PRINT expression ';'
-                       | PRINT multi_print ';'"""
+        """print_instr : PRINT multi_print ';'"""
         p[0] = AST.PrintInstr(p[2])
 
 
 
     def p_multi_print(self, p):
-        """multi_print : expression ',' multi_print
+        """multi_print : multi_print ',' expression
                        | expression"""
-        if(len(p) > 2):
-            p[0] = p[1] + p[3]
-        else:
+        if (not isinstance(p[0], list)):
+            p[0] = []
+        if (len(p) == 4):
             p[0] = p[1]
-
+            p[0].append(p[3])
+        else:
+            p[0].append(p[1])
 
     def p_if_instr(self, p):
         """if_instr  : IF  '(' condition ')' instr_opt
@@ -200,7 +202,7 @@ class Mparser(object):
         elif(isinstance(p[1], float)):
             p[0] = AST.FloatNum(p[1])
         elif(isinstance(p[1], str)):
-            p[0] = AST.Variable(p[0])
+            p[0] = AST.Variable(p[1])
 
 
 
@@ -224,7 +226,7 @@ class Mparser(object):
                        | STRING
                        | ones_instr
                        | zeros_instr
-                       | eye_instr """
+                       | eye_instr"""
         if(len(p) == 4):
             p[0] = AST.BinExpr(p[2], p[1], p[3])
         elif(len(p) == 3):
@@ -247,60 +249,57 @@ class Mparser(object):
 
     def p_matrix_transp(self, p):
         """matrix_transp : matrix "'" """
-        p[0] = p[1]
+        p[0] = AST.MatrixTransp(p[1])
 
 
     def p_body(self, p):
         '''body : row
                 | rows_with_brackets
                 | rows_with_semicolons'''
-        p[0] = [p[1]]
+        p[0] = p[1]
 
 
     def p_rows_with_brackets(self, p):
         '''rows_with_brackets : '[' row ']'
-                             | '[' row ']' ',' rows_with_brackets'''
+                              | rows_with_brackets ',' '[' row ']' '''
         if (not isinstance(p[0], list)):
             p[0] = []
 
-        if (len(p) == 4):
-            p[0].append(p[2])
+        if (len(p) != 4):
+            p[0] = p[1]
+            p[0].append(p[4])
         else:
             p[0].append(p[2])
-            p[0].append(p[4])
-
 
 
     def p_rows_with_semicolons(self, p):
         '''rows_with_semicolons : row
-                                | row ';' rows_with_semicolons'''
+                                | rows_with_semicolons ';' row'''
         if (not isinstance(p[0], list)):
             p[0] = []
 
-        if (len(p) == 2):
-            p[0].append(p[1])
+        if (len(p) != 2):
+            p[0] = p[1]
+            p[0].append(p[3])
         else:
             p[0].append(p[1])
-            p[0].append(p[3])
 
 
     def p_row(self, p):
         """row : NUMBER
-               | NUMBER ',' row """
+               | row ',' NUMBER """
         if(not isinstance(p[0], list)):
             p[0] = []
-
-        if(len(p) == 2):
-            p[0].append(p[1])
+        if(len(p) != 2):
+            p[0] = p[1]
+            p[0].append(p[3])
         else:
             p[0].append(p[1])
-            p[0].append(p[3])
 
 
     def p_number(self, p):
         """NUMBER : INTNUM
                   | FLOATNUM"""
-        print(type(p[1]))
         if(isinstance(p[1], int)):
             p[0] = AST.IntNum(p[1])
         else:

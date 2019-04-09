@@ -79,7 +79,7 @@ class TreePrinter:
 
     @addToClass(AST.WhileInstr)
     def printTree(self, indent=0):
-        ret = INDENT_TOKEN * indent + "WHILE\n" + self.cond.printTree(indent+1) + "\n"
+        ret = INDENT_TOKEN * indent + "WHILE\n" + self.cond.printTree(indent+1)
         for ins in self.instr.instructions:
             ret += ins.printTree(indent + 1)
         return ret
@@ -141,11 +141,14 @@ class TreePrinter:
 
     @addToClass(AST.MatrixTransp)
     def printTree(self, indent=0):
-        return INDENT_TOKEN * indent + "TRANSPOSE\n" + self.matrix.printTree(indent+1)
+        return INDENT_TOKEN * indent + "TRANSPOSE\n" \
+               + INDENT_TOKEN * (indent + 1) + self.matrix + "\n"
 
     @addToClass(AST.Matrix_bin_ops)
     def printTree(self, indent=0):
-        return INDENT_TOKEN * indent + self.op + "\n" + self.left.printTree(indent+1) + self.right.printTree(indent+1)
+        return INDENT_TOKEN * indent + self.op + "\n" \
+               + INDENT_TOKEN * (indent + 1) + self.left + "\n" \
+               + self.right.printTree(indent + 1)
 
     @addToClass(AST.Program)
     def printTree(self, indent=0):

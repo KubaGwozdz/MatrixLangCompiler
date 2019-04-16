@@ -8,3 +8,20 @@ D3 *= A.*B' ; # multiply element-wise A with transpose of B
 D4 /= A./B' ; # divide element-wise A with transpose of B
 
 A[1,3] = 0 ;
+
+
+for i = 1:N {
+    if(i<=N/16)
+        print i;
+    else if(i<=N/8)
+        break;
+    else if(i<=N/4)
+        continue;
+    else if(i<=N/2)
+        return 0;
+}
+
+
+for i = 1:N
+  for j = i:M
+    print i, j;

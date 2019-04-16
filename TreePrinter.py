@@ -21,7 +21,7 @@ class TreePrinter:
     def printTree(self, indent=0):
         ret = ""
         for i in self.instructions:
-            ret += i.printTree(0)
+            ret += i.printTree(indent)
         return ret
         #return self.instructions[0].printTree(indent + 1)
 
@@ -152,7 +152,7 @@ class TreePrinter:
 
     @addToClass(AST.Program)
     def printTree(self, indent=0):
-        return self.instructions.printTree(indent+1)
+        return self.instructions.printTree(indent)
 
     @addToClass(AST.Error)
     def printTree(self, indent=0):

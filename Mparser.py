@@ -63,7 +63,8 @@ class Mparser(object):
         """instr_opt : '{' instructions '}'
                      | instruction"""
         if len(p) == 2:
-            p[0] = p[1]
+            p[0] = AST.InstructionList()
+            p[0].add_instruction(p[1])
         else:
             p[0] = p[2]
 
@@ -77,8 +78,7 @@ class Mparser(object):
                        | cont_instr
                        | return_instr
                        | assignment
-                       | range_instr
-                       | '{' instructions '}' """
+                       | '{' instructions '}'"""
         if(p[1] == '{'):
             expr = p[2]
             p[0] = AST.CompoundInstr(expr)

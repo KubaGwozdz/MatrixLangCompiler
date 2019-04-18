@@ -71,7 +71,8 @@ class Mparser(object):
                        | '{' instructions '}'"""
         if(p[1] == '{'):
             expr = p[2]
-            p[0] = AST.CompoundInstr(expr)
+            p[0] = expr
+            #p[0] = AST.CompoundInstr(expr)
         else:
             p[0] = p[1]
 

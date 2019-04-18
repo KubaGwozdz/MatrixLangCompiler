@@ -26,6 +26,11 @@ class FloatNum(Node):
         self.value = value
 
 
+class String(Node):
+    def __init__(self, val):
+        self.val = val
+
+
 class Variable(Node):
     def __init__(self, name):
         self.name = name
@@ -36,6 +41,11 @@ class BinExpr(Node):
         self.op = op
         self.left = left
         self.right = right
+
+
+class NegatedExpr(Node):
+    def __init__(self, expr):
+        self.expr = expr
 
 
 class RelExpr(Node):

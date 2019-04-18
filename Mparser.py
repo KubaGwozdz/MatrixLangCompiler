@@ -21,8 +21,8 @@ class Mparser(object):
         ("left", '+', '-'),
         ("left", 'MATRIX_PLUS', 'MATRIX_MINUS'),
         ("left", '*', '/'),
-        ("left", 'MATRIX_TIMES', 'MATRIX_DIVIDE')
-
+        ("left", 'MATRIX_TIMES', 'MATRIX_DIVIDE'),
+        ("left", '\'')
     )
 
 
@@ -57,16 +57,6 @@ class Mparser(object):
         else:
             p[0] = AST.InstructionList()
             p[0].add_instruction(p[1])
-
-
-    def p_instr_opt(self, p):
-        """instr_opt : '{' instructions '}'
-                     | instruction"""
-        if len(p) == 2:
-            p[0] = AST.InstructionList()
-            p[0].add_instruction(p[1])
-        else:
-            p[0] = p[2]
 
 
     def p_instruction(self, p):
@@ -104,10 +94,10 @@ class Mparser(object):
             p[0].append(p[1])
 
     def p_if_instr(self, p):
-        """if_instr  : IF  '(' condition ')' instr_opt
+        """if_instr  : IF  '(' condition ')' instruction
                      | IF '(' condition ')' if_instr
-                     | IF  '(' condition ')' instr_opt ELSE if_instr
-                     | IF  '(' condition ')' instr_opt ELSE instr_opt"""
+                     | IF  '(' condition ')' instruction ELSE if_instr
+                     | IF  '(' condition ')' instruction ELSE instruction"""
         if(len(p) > 6):
             p[0] = AST.IfInstr(p[3], p[5], p[7])
         else:
@@ -115,13 +105,13 @@ class Mparser(object):
 
 
     def p_for_instr(self, p):
-        """for_instr : FOR ID '=' range_instr instr_opt"""
+        """for_instr : FOR ID '=' range_instr instruction"""
         p[0] = AST.ForInstr(p[2], p[4], p[5])
 
 
 
     def p_while_instr(self, p):
-        """while_instr : WHILE '(' condition ')' instr_opt"""
+        """while_instr : WHILE '(' condition ')' instruction"""
         p[0] = AST.WhileInstr(p[3], p[5])
 
 
@@ -223,16 +213,21 @@ class Mparser(object):
                        | '-' expression
                        | m_expr
                        | matrix
-                       | STRING
+                       | string
                        | ones_instr
                        | zeros_instr
                        | eye_instr"""
         if(len(p) == 4):
             p[0] = AST.BinExpr(p[2], p[1], p[3])
         elif(len(p) == 3):
-            p[0] = -p[2] #TODO: jak zanegowac?
+            p[0] = AST.NegatedExpr(p[2])
         else:
             p[0] = p[1]
+
+
+    def p_string(self, p):
+        """ string : STRING"""
+        p[0] = AST.String(p[1])
 
 
     #------ matrix parse: ------

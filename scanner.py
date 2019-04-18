@@ -33,7 +33,7 @@ class Scanner(object):
                'ADDASSIGN', 'SUBASSIGN',
                'DIVASSIGN', 'MULASSIGN',
                'SMALLEREQ', 'GREATEREQ', 'NOTEQ', 'EQ',
-              'FLOATNUM', 'INTNUM', 'ID', 'STRING'] + list(reserved.values())
+               'FLOATNUM', 'INTNUM', 'ID', 'STRING'] + list(reserved.values())
 
     t_MATRIX_PLUS    = r'\.\+'
     t_MATRIX_MINUS   = r'\.\-'

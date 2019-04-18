@@ -33,6 +33,10 @@ class TreePrinter:
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + str(self.value) + "\n"
 
+    @addToClass(AST.String)
+    def printTree(self, indent=0):
+        return INDENT_TOKEN * indent + self.val + "\n"
+
     @addToClass(AST.Variable)
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + str(self.name) + "\n"
@@ -45,9 +49,12 @@ class TreePrinter:
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + self.op + "\n" + self.left.printTree(indent + 1) + self.right.printTree(indent + 1)
 
+    @addToClass(AST.NegatedExpr)
+    def printTree(self, indent=0):
+        return INDENT_TOKEN * indent + "-\n" + self.expr.printTree(indent + 1)
+
     @addToClass(AST.AssInstr)
     def printTree(self, indent=0):
-        #return INDENT_TOKEN * indent + self.op + "\n" + self.left.printTree(indent + 1) + self.right.printTree(indent + 1)
         return INDENT_TOKEN * indent + self.op + "\n" + \
                INDENT_TOKEN * (indent + 1) + str(self.left) + "\n" \
                + self.right.printTree(indent + 1)

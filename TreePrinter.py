@@ -95,7 +95,7 @@ class TreePrinter:
     def printTree(self, indent=0):
         ret = INDENT_TOKEN * indent + "FOR\n" + INDENT_TOKEN * (indent + 1) + self.id + "\n" \
         + INDENT_TOKEN * indent + self.range.printTree(indent + 1) + "\n"
-        for ins in self.instr.instructions:
+        for ins in self.instr:
            ret += ins.printTree(indent + 1)
         return ret
 
@@ -119,9 +119,9 @@ class TreePrinter:
             ret += INDENT_TOKEN * (indent + 1) + str(expr_to_print)
         return ret
 
-    @addToClass(AST.CompoundInstr)
-    def printTree(self, indent=0):
-        return INDENT_TOKEN * indent + "COMPOUND\n" + self.instr.printTree(indent+1)
+    #@addToClass(AST.CompoundInstr)
+    #def printTree(self, indent=0):
+    #    return INDENT_TOKEN * indent + "COMPOUND\n" + self.instr.printTree(indent+1)
 
     @addToClass(AST.EyeInstr)
     def printTree(self, indent=0):

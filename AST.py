@@ -122,9 +122,9 @@ class PrintInstr(Node):
         self.expr = expr
 
 
-class CompoundInstr(Node):
-    def __init__(self, instr):
-        self.instr = instr
+#class CompoundInstr(Node):
+#    def __init__(self, instr):
+#        self.instr = instr
 
 
 class EyeInstr(Node):

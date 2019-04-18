@@ -17,6 +17,7 @@ class Mparser(object):
         ("nonassoc", 'ELSE'),
         ("nonassoc", 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
         ("right", '='),
+        ("nonassoc", '<', '>'),
         ("nonassoc", 'SMALLEREQ', 'GREATEREQ', 'NOTEQ', 'EQ'),
         ("left", '+', '-'),
         ("left", 'MATRIX_PLUS', 'MATRIX_MINUS'),
@@ -68,11 +69,9 @@ class Mparser(object):
                        | cont_instr
                        | return_instr
                        | assignment
-                       | '{' instructions '}'"""
-        if(p[1] == '{'):
-            expr = p[2]
-            p[0] = expr
-            #p[0] = AST.CompoundInstr(expr)
+                       | '{' instructions '}' """
+        if(p[1] == '{'): #TODO: zapytać o compound, czy jest różnica z for { ... } a { ... }
+            p[0] = p[2]
         else:
             p[0] = p[1]
 
@@ -80,7 +79,6 @@ class Mparser(object):
     def p_print_instr(self, p):
         """print_instr : PRINT multi_print ';'"""
         p[0] = AST.PrintInstr(p[2])
-
 
 
     def p_multi_print(self, p):
@@ -107,13 +105,13 @@ class Mparser(object):
 
     def p_for_instr(self, p):
         """for_instr : FOR ID '=' range_instr instruction"""
-        p[0] = AST.ForInstr(p[2], p[4], p[5])
+        p[0] = AST.ForInstr(p[2], p[4], [p[5]])
 
 
 
     def p_while_instr(self, p):
         """while_instr : WHILE '(' condition ')' instruction"""
-        p[0] = AST.WhileInstr(p[3], p[5])
+        p[0] = AST.WhileInstr(p[3], [p[5]])
 
 
     def p_break_instr(self, p):
@@ -149,7 +147,7 @@ class Mparser(object):
     def p_assignment(self, p):
         """assignment : ID assign_ops matrix ';'
                       | ID assign_ops expression ';'
-                      | ID '[' INTNUM ',' INTNUM ']' assign_ops NUMBER ';' """
+                      | ID '[' INTNUM ',' INTNUM ']' assign_ops expression ';' """
         if(len(p)<6):
             p[0] = AST.AssInstr(p[2], p[1], p[3])
         else:
@@ -166,7 +164,7 @@ class Mparser(object):
         p[0] = p[1]
 
 
-    def p_range_instr(self, p): # var_or_id -> var\ id
+    def p_range_instr(self, p):
         """range_instr : INTNUM ':' INTNUM
                        | INTNUM ':' ID
                        | ID ':' ID
@@ -184,10 +182,10 @@ class Mparser(object):
         p[0] = AST.CondInstr(p[1], p[2], p[3])
 
 
-    def p_cond_par(self, p):
-        """cond_par : INTNUM
-                    | FLOATNUM
-                    | ID"""
+    def p_number_or_id(self, p):
+        """number_or_id : INTNUM
+                        | FLOATNUM
+                        | ID"""
         if(isinstance(p[1], int)):
             p[0] = AST.IntNum(p[1])
         elif(isinstance(p[1], float)):
@@ -210,10 +208,9 @@ class Mparser(object):
                        | expression '-' expression
                        | expression '*' expression
                        | expression '/' expression
-                       | cond_par
+                       | number_or_id
                        | '-' expression
                        | m_expr
-                       | matrix
                        | string
                        | ones_instr
                        | zeros_instr
@@ -250,8 +247,7 @@ class Mparser(object):
 
 
     def p_body(self, p):
-        '''body : row
-                | rows_with_brackets
+        '''body : rows_with_brackets
                 | rows_with_semicolons'''
         p[0] = p[1]
 

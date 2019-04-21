@@ -2,15 +2,23 @@ class Node(object):
     def __str__(self):
         return self.printTree()
 
+    def accept(self, visitor, table=None):
+        return visitor.visit(self)
+
+    def setParent(self, parent):
+        self.parent = parent
+
 
 class Program(Node):
     def __init__(self, instructions):
         self.instructions = instructions
+        self.children = instructions
 
 
 class InstructionList(Node):
     def __init__(self):
         self.instructions = []
+        self.children = ( )
 
     def add_instruction(self, instr):
         self.instructions.append(instr)
@@ -19,6 +27,7 @@ class InstructionList(Node):
 class IntNum(Node):
     def __init__(self, value):
         self.value = value
+        self.children = ( )
 
 
 class FloatNum(Node):

@@ -82,7 +82,7 @@ class TypeChecker(NodeVisitor):
         op = node.op
         if ttype[op][lhs][rhs] is None:
             self.isValid = False
-            print("Bad expression {} in line {}".format(node.op, node.line))
+            print("Bad expression {} in line {}".format(node.op, node.left.line))
         return ttype[op][lhs][rhs]
 
     def visit_NegatedExpr(self, node, table):
@@ -227,7 +227,7 @@ class TypeChecker(NodeVisitor):
             if len(i) != length:
                 print("Implementing matrix with diffrent size vectors: line {}".format(node.line))
                 break
-        pass
+        return "matrix"
 
     def visit_MatrixTransp(self, node, table):
         pass

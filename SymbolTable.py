@@ -1,21 +1,27 @@
 #!/usr/bin/python
+from collections import defaultdict
 
 
 class Symbol:
-    def __init__(self, name, type):
-        self.name = name
-        self.type = type
+    pass
 
 
 class VariableSymbol(Symbol):
-    pass
-    #
-
-class FunctionSymbol(Symbol):
-    def __init__(self, name, type, arguments):
+    def __init__(self, name, type):
         self.name = name
         self.type = type
-        self.arguments = arguments
+    #
+
+
+class FunctionSymbol(Symbol):
+    def __init__(self, name, type, table):
+        self.name = name
+        self.type = type
+        self.params = []
+        self.table = table
+
+    def extractParams(self):
+        self.params = [x.type for x in self.table.symbols.values()]
 
 
 class SymbolTable(object):
@@ -27,21 +33,25 @@ class SymbolTable(object):
     #
 
     def put(self, name, symbol): # put variable symbol or fundef under <name> entry
-        if self.symbols.__contains__(name):
-            return False
-        else:
-            self.symbols[name] = symbol
-            return True
+        self.symbols[name] = symbol
     #
 
     def get(self, name): # get variable symbol or fundef from <name> entry
-        if self.symbols.__contains__(name):
-            return self.symbols[name]
-        elif self.parent:
-            return self.parent.get(name)
-        else:
+        try:
+            ret = self.symbols[name]
+            return ret
+        except:
             return None
     #
+
+    def getGlobal(self, name):
+        if self.get(name) is None:
+            if self.parent is not None:
+                return self.parent.getGlobal(name)
+            else:
+                return None
+        else:
+            return self.get(name)
 
     def getParentScope(self):
         return self.parent

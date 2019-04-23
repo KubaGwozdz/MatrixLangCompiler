@@ -22,7 +22,7 @@ if __name__ == '__main__':
     text = file.read()
     ast = parser.parse(text, lexer=Mparser.scanner)
     typeChecker = TypeChecker()
-    #typeChecker.visit(ast)
+    typeChecker.visit(ast)
     print(typeChecker.isValid)
 
 

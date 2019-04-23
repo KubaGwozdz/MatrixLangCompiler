@@ -217,7 +217,7 @@ class Mparser(object):
 
     def p_id(self, p):
         """id : ID"""
-        AST.Variable(p[1])
+        p[0] = AST.Variable(p[1])
 
     def p_matrix_transp(self, p):
         """matrix_transp : matrix "'" """

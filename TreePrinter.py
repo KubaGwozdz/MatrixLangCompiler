@@ -56,7 +56,7 @@ class TreePrinter:
     @addToClass(AST.AssInstr)
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + self.op + "\n" + \
-               INDENT_TOKEN * (indent + 1) + str(self.left) + "\n" \
+               INDENT_TOKEN * (indent + 1) + self.left.printTree(indent )  \
                + self.right.printTree(indent + 1)
 
     @addToClass(AST.AssTabInstr)
@@ -70,8 +70,8 @@ class TreePrinter:
     @addToClass(AST.RangeInstr)
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + "RANGE" + "\n" \
-               + INDENT_TOKEN * (indent + 1) + str(self.frm) \
-               + INDENT_TOKEN * (indent + 1) + str(self.to)
+               + INDENT_TOKEN * (indent) + self.frm.printTree(indent) \
+               + INDENT_TOKEN * (indent) + self.to.printTree(indent)
 
     @addToClass(AST.CondInstr)
     def printTree(self, indent=0):
@@ -96,8 +96,8 @@ class TreePrinter:
 
     @addToClass(AST.ForInstr)
     def printTree(self, indent=0):
-        ret = INDENT_TOKEN * indent + "FOR\n" + INDENT_TOKEN * (indent + 1) + self.id + "\n" \
-        + INDENT_TOKEN * indent + self.range.printTree(indent + 1) + "\n"
+        ret = INDENT_TOKEN * indent + "FOR\n" + INDENT_TOKEN * (indent) + self.id.printTree(indent + 1)  \
+        + INDENT_TOKEN * indent + self.range.printTree(indent+1)
         if type(self.instr) == list:
             for ins in self.instr.instructions:
                 ret += ins.printTree(indent + 1)

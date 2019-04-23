@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from collections import defaultdict
 
 
 class Symbol:

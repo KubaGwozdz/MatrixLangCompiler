@@ -12,22 +12,21 @@ class Node(object):
 class Program(Node):
     def __init__(self, instructions):
         self.instructions = instructions
-        self.children = instructions
 
 
 class InstructionList(Node):
     def __init__(self):
         self.instructions = []
-        self.children = ( )
+        self.children = []
 
     def add_instruction(self, instr):
         self.instructions.append(instr)
+        self.children.append(instr)
 
 
 class IntNum(Node):
     def __init__(self, value):
         self.value = value
-        self.children = ( )
 
 
 class FloatNum(Node):

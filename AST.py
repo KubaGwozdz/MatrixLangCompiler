@@ -70,19 +70,21 @@ class RelExpr(Node):
 
 
 class AssInstr(Node):
-    def __init__(self, op, left, right):
+    def __init__(self, op, left, right, line):
         self.op = op
         self.left = left
         self.right = right
+        self.line = line
 
 
 class AssTabInstr(Node):
-    def __init__(self, op, left, frm, to, right):
+    def __init__(self, op, left, frm, to, right, line):
         self.op = op
         self.left = left
         self.frm = frm
         self.to = to
         self.right = right
+        self.line = line
 
 
 class RangeInstr(Node):
@@ -99,23 +101,26 @@ class CondInstr(Node):
 
 
 class IfInstr(Node):
-    def __init__(self, cond, instr1, instr2=None):
+    def __init__(self, line, cond, instr1, instr2=None):
+        self.line = line
         self.cond = cond
         self.instr1 = instr1
         self.instr2 = instr2
 
 
 class WhileInstr(Node):
-    def __init__(self, cond, instr):
+    def __init__(self, cond, instr, line):
         self.cond = cond
         self.instr = instr
+        self.line = line
 
 
 class ForInstr(Node):
-    def __init__(self, id, range, instr):
+    def __init__(self, id, range, instr, line):
         self.id = id
         self.range = range
         self.instr = instr
+        self.line = line
 
 
 class BreakInstr(Node):

@@ -9,7 +9,7 @@ class VariableSymbol(Symbol):
     def __init__(self, name, type):
         self.name = name
         self.type = type
-    #
+
 
 
 class FunctionSymbol(Symbol):
@@ -24,7 +24,6 @@ class FunctionSymbol(Symbol):
 
 
 class SymbolTable(object):
-
     def __init__(self, parent, name): # parent scope and symbol table name
         self.symbols = {}
         self.name = name
@@ -42,6 +41,9 @@ class SymbolTable(object):
         except:
             return None
     #
+
+    def delete(self, name):
+        self.symbols.pop(name)
 
     def getGlobal(self, name):
         if self.get(name) is None:

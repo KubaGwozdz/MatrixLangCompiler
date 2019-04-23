@@ -96,12 +96,11 @@ class Mparser(object):
 
     def p_for_instr(self, p):
         """for_instr : FOR ID '=' range_instr instruction"""
-        p[0] = AST.ForInstr(p[2], p[4], p[5], p.lineno(1))
+        p[0] = AST.ForInstr(AST.Variable(p[2]), p[4], p[5], p.lineno(1))
 
     def p_while_instr(self, p):
         """while_instr : WHILE '(' condition ')' instruction"""
         p[0] = AST.WhileInstr(p[3], p[5], p.lineno(1))
-
 
     def p_break_instr(self, p):
         """break_instr : BREAK ';' """
@@ -132,9 +131,9 @@ class Mparser(object):
                       | ID assign_ops expression ';'
                       | ID '[' INTNUM ',' INTNUM ']' assign_ops expression ';' """
         if(len(p)<6):
-            p[0] = AST.AssInstr(p[2], p[1], p[3], p.lineno(1))
+            p[0] = AST.AssInstr(p[2], AST.Variable(p[1]), p[3], p.lineno(1))
         else:
-            p[0] = AST.AssTabInstr(p[7], p[1], AST.IntNum(p[3]), AST.IntNum(p[5]), p[8], p.lineno(1))
+            p[0] = AST.AssTabInstr(p[7], AST.Variable(p[1]), AST.IntNum(p[3]), AST.IntNum(p[5]), p[8], p.lineno(1))
 
     def p_assign_ops(self, p):
         """assign_ops : SUBASSIGN
@@ -146,10 +145,11 @@ class Mparser(object):
 
     def p_range_instr(self, p):
         """range_instr : int ':' int
-                       | int ':' ID
-                       | ID ':' ID
-                       | ID ':' int"""
-        p[0] = AST.RangeInstr(p[1], p[3])
+                       | int ':' id
+                       | id ':' id
+                       | id ':' int"""
+        p[0] = AST.RangeInstr(p[1],p[3])
+
 
     def p_int(self, p):
         """int : INTNUM"""
@@ -209,11 +209,15 @@ class Mparser(object):
     def p_matrix(self, p):
         """matrix : '[' body ']'
                   | matrix_transp
-                  | ID"""
+                  | id"""
         if len(p) == 4:
             p[0] = AST.Matrix(p[2])
         else:
             p[0] = p[1]
+
+    def p_id(self, p):
+        """id : ID"""
+        AST.Variable(p[1])
 
     def p_matrix_transp(self, p):
         """matrix_transp : matrix "'" """

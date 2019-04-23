@@ -1,4 +1,7 @@
 class Node(object):
+    def __init__(self,parent=False):
+        self.parent = parent
+
     def __str__(self):
         return self.printTree()
 

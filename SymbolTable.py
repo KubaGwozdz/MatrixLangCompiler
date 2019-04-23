@@ -11,7 +11,6 @@ class VariableSymbol(Symbol):
         self.type = type
 
 
-
 class FunctionSymbol(Symbol):
     def __init__(self, name, type, table):
         self.name = name

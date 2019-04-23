@@ -142,11 +142,12 @@ class TypeChecker(NodeVisitor):
         if node.instr2 is not None:
             self.visit(node.instr2, table)
 
-
     def visit_WhileInstr(self, node, table):
         state, msg = self.visit(node.cond, table)
         if state == False:
             print(msg + "in line {}.".format(node.line))
+        for child in node.instr:
+            child.setParent(True)
         self.visit(node.instr, table)
 
     def visit_ForInstr(self, node, table):
@@ -160,10 +161,11 @@ class TypeChecker(NodeVisitor):
         self.visit(node.instr, table)
 
 
-
-
     def visit_BreakInstr(self, node, table):
-        pass
+        if node.parent:
+            pass
+        else:
+            print("Break without loop: line {}".format(0))
 
     def visit_ContinueInstr(self, node, table):
         pass

@@ -71,7 +71,7 @@ class Mparser(object):
 
     def p_print_instr(self, p):
         """print_instr : PRINT multi_print ';'"""
-        p[0] = AST.PrintInstr(p[2])
+        p[0] = AST.PrintInstr(p[2], p.lineno(1))
 
     def p_multi_print(self, p):
         """multi_print : multi_print ',' expression
@@ -104,11 +104,11 @@ class Mparser(object):
 
     def p_break_instr(self, p):
         """break_instr : BREAK ';' """
-        p[0] = AST.BreakInstr()
+        p[0] = AST.BreakInstr(p.lineno(1))
 
     def p_cont_instr(self, p):
         """cont_instr : CONTINUE ';' """
-        p[0] = AST.ContinueInstr()
+        p[0] = AST.ContinueInstr(p.lineno(1))
 
     def p_return_instr(self, p):
         """return_instr : RETURN expression ';'"""
@@ -116,15 +116,15 @@ class Mparser(object):
 
     def p_eye_instr(self, p):
         """eye_instr : EYE '(' int ')'"""
-        p[0] = AST.EyeInstr(p[3])
+        p[0] = AST.EyeInstr(p[3], p.lineno(1))
 
     def p_zeros_instr(self, p):
         """zeros_instr : ZEROS '(' int ')' """
-        p[0] = AST.ZerosInstr(p[3])
+        p[0] = AST.ZerosInstr(p[3], p.lineno(1))
 
     def p_ones_instr(self, p):
         """ones_instr : ONES '(' int ')' """
-        p[0] = AST.OnesInstr(p[3])
+        p[0] = AST.OnesInstr(p[3], p.lineno(1))
 
     def p_assignment(self, p):
         """assignment : id assign_ops matrix ';'
@@ -211,7 +211,7 @@ class Mparser(object):
                   | matrix_transp
                   | id"""
         if len(p) == 4:
-            p[0] = AST.Matrix(p[2])
+            p[0] = AST.Matrix(p[2], p.lineno(1))
         else:
             p[0] = p[1]
 

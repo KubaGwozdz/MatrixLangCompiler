@@ -48,11 +48,6 @@ class NodeVisitor(object):
                 else:
                     print(node)
 
-    # simpler version of generic_visit, not so general
-    # def generic_visit(self, node):
-    #    for child in node.children:
-    #        self.visit(child)
-
 
 class TypeChecker(NodeVisitor):
     def __init__(self):
@@ -81,7 +76,7 @@ class TypeChecker(NodeVisitor):
         else:
             return definition.type
 
-    def visit_BinExpr(self, node, table):       #TODO: czemu linia z parsera = 0?
+    def visit_BinExpr(self, node, table):
         lhs = self.visit(node.left, table)
         rhs = self.visit(node.right, table)
         op = node.op
@@ -93,8 +88,6 @@ class TypeChecker(NodeVisitor):
     def visit_NegatedExpr(self, node, table):
         pass
 
-    '''def visit_RelExpr(self, node, table):
-        pass'''
 
     def visit_AssInstr(self, node, table):
         definition = self.visit(node.left, table)
@@ -109,7 +102,6 @@ class TypeChecker(NodeVisitor):
 
     def visit_AssTabInstr(self, node, table):
         definition = self.visit(node.left, table)
-        #type = self.visit(node.right)
         if definition is None:
             self.isValid = False
             print("Trying to modify unknown matrix: {} in line {}.".format(node.left, node.line))
@@ -170,6 +162,7 @@ class TypeChecker(NodeVisitor):
         range_t = self.visit(node.range, table)
         if id_t is not None:
             print("Iterator {} already in use, line: ".format(node.id, node.line))
+            self.isValid = False
         else:
             table.put(node.id.name, VariableSymbol(node.id.name, range_t))
             temp_var = True
@@ -186,49 +179,53 @@ class TypeChecker(NodeVisitor):
         if node.parent is not None:
             pass
         else:
-            print("Break without loop: line {}".format(0))
+            print("Break without loop: line {}".format(node.line))
+            self.isValid = False
 
     def visit_ContinueInstr(self, node, table):
         if node.parent is not None:
             pass
         else:
-            print("Continue without loop: line {}".format(0))
+            print("Continue without loop: line {}".format(node.line))
+            self.isValid = False
 
     def visit_ReturnInstr(self, node, table):
         if node.parent is not None:
             pass
         else:
-            print("Return without loop: line {}".format(0))
+            print("Return without loop: line {}".format(node.line))
+            self.isValid = False
 
     def visit_PrintInstr(self, node, table):
-        return self.visit(node.instructions, table)
+        return self.visit(node.expr, table)
 
     def visit_EyeInstr(self, node, table):
         type = self.visit(node.intnum, table)
         if type == "int":
             pass
         else:
-            print("Wrong argument to eye instruction: line {}".format(0))
+            print("Wrong argument to eye instruction: line {}".format(node.line))
+            self.isValid = False
 
     def visit_ZerosInstr(self, node, table):
         type = self.visit(node.intnum, table)
         if type == "int":
             pass
         else:
-            print("Wrong argument to zeros instruction: line {}".format(0))
+            print("Wrong argument to zeros instruction: line {}".format(node.line))
 
     def visit_OnesInstr(self, node, table):
         type = self.visit(node.intnum, table)
         if type == "int":
             pass
         else:
-            print("Wrong argument to ones instruction: line {}".format(0))
+            print("Wrong argument to ones instruction: line {}".format(node.line))
 
     def visit_Matrix(self, node, table):
         length = len(node.body[0])
         for i in node.body:
             if len(i) != length:
-                print("Implementing matrix with diffrent size vectors: line {}".format(0))
+                print("Implementing matrix with diffrent size vectors: line {}".format(node.line))
                 break
         pass
 

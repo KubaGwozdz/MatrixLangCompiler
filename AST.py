@@ -15,40 +15,47 @@ class Node(object):
 class Program(Node):
     def __init__(self, instructions):
         self.instructions = instructions
+        super().__init__()
 
 
 class InstructionList(Node):
     def __init__(self):
         self.instructions = []
         self.children = []
+        super().__init__()
 
     def add_instruction(self, instr):
         self.instructions.append(instr)
         self.children.append(instr)
+        super().__init__()
 
 
 class IntNum(Node):
     def __init__(self, value, line):
         self.value = value
         self.line = line
+        super().__init__()
 
 
 class FloatNum(Node):
     def __init__(self, value, line):
         self.value = value
         self.line = line
+        super().__init__()
 
 
 class String(Node):
     def __init__(self, val, line):
         self.val = val
         self.line = line
+        super().__init__()
 
 
 class Variable(Node):
     def __init__(self, name, line):
         self.name = name
         self.line = line
+        super().__init__()
 
 
 class BinExpr(Node):
@@ -57,11 +64,13 @@ class BinExpr(Node):
         self.left = left
         self.right = right
         self.line = line
+        super().__init__()
 
 
 class NegatedExpr(Node):
     def __init__(self, expr):
         self.expr = expr
+        super().__init__()
 
 
 class RelExpr(Node):
@@ -70,6 +79,7 @@ class RelExpr(Node):
         self.left = left
         self.right = right
         self.line = line
+        super().__init__()
 
 
 class AssInstr(Node):
@@ -78,6 +88,7 @@ class AssInstr(Node):
         self.left = left
         self.right = right
         self.line = line
+        super().__init__()
 
 
 class AssTabInstr(Node):
@@ -88,12 +99,14 @@ class AssTabInstr(Node):
         self.to = to
         self.right = right
         self.line = line
+        super().__init__()
 
 
 class RangeInstr(Node):
     def __init__(self, frm, to):
         self.frm = frm
         self.to = to
+        super().__init__()
 
 
 class CondInstr(Node):
@@ -101,6 +114,7 @@ class CondInstr(Node):
         self.expr_l = expr_l
         self.expr_r = expr_r
         self.op = op
+        super().__init__()
 
 
 class IfInstr(Node):
@@ -109,6 +123,7 @@ class IfInstr(Node):
         self.cond = cond
         self.instr1 = instr1
         self.instr2 = instr2
+        super().__init__()
 
 
 class WhileInstr(Node):
@@ -116,6 +131,7 @@ class WhileInstr(Node):
         self.cond = cond
         self.instr = instr
         self.line = line
+        super().__init__()
 
 
 class ForInstr(Node):
@@ -124,26 +140,33 @@ class ForInstr(Node):
         self.range = range
         self.instr = instr
         self.line = line
+        super().__init__()
 
 
 class BreakInstr(Node):
-    pass
+    def __init__(self, line):
+        self.line = line
+        super().__init__()
 
 
 class ContinueInstr(Node):
-    pass
+    def __init__(self, line):
+        self.line = line
+        super().__init__()
 
 
 class ReturnInstr(Node):
     def __init__(self, expr, line):
         self.expr = expr
         self.line = line
+        super().__init__()
 
 
 class PrintInstr(Node):
     def __init__(self, expr, line):
         self.expr = expr
         self.line = line
+        super().__init__()
 
 
 #class CompoundInstr(Node):
@@ -152,28 +175,37 @@ class PrintInstr(Node):
 
 
 class EyeInstr(Node):
-    def __init__(self, intnum):
+    def __init__(self, intnum, line):
         self.intnum = intnum
+        self.line = line
+        super().__init__()
 
 
 class ZerosInstr(Node):
-    def __init__(self, intnum):
+    def __init__(self, intnum, line):
         self.intnum = intnum
+        self.line = line
+        super().__init__()
 
 
 class OnesInstr(Node):
-    def __init__(self, intnum):
+    def __init__(self, intnum, line):
         self.intnum = intnum
+        self.line = line
+        super().__init__()
 
 
 class Matrix(Node):
-    def __init__(self, body):
+    def __init__(self, body, line):
         self.body = body
+        self.line = line
+        super().__init__()
 
 
 class MatrixTransp(Node):
     def __init__(self, matrix):
         self.matrix = matrix
+        super().__init__()
 
 
 class Matrix_bin_ops(Node):
@@ -181,6 +213,7 @@ class Matrix_bin_ops(Node):
         self.left = left
         self.op = op
         self.right = right
+        super().__init__()
 
 
 class Error(Node):
@@ -188,3 +221,4 @@ class Error(Node):
         self.lineno = lineno
         self.type = type
         self.value = value
+        super().__init__()

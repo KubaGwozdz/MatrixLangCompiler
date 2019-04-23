@@ -164,19 +164,23 @@ class TypeChecker(NodeVisitor):
         self.visit(node.instr, table)
 
     def visit_ForInstr(self, node, table):
-        id_t = table.getGlobal(node.id)
+        temp_var = False
+        id_t = self.visit(node.id, table)
         node.range.setParent(node)
         range_t = self.visit(node.range, table)
         if id_t is not None:
             print("Iterator {} already in use, line: ".format(node.id, node.line))
         else:
-            table.put(node.id, VariableSymbol(node.id, range_t))
+            table.put(node.id.name, VariableSymbol(node.id.name, range_t))
+            temp_var = True
         if type(node.instr) == list:
             for child in node.instr:
                 child.setParent(node)
         else:
             node.instr.setParent(node)
         self.visit(node.instr, table)
+        if temp_var:
+            table.delete(node.id.name)
 
     def visit_BreakInstr(self, node, table):
         if node.parent is not None:

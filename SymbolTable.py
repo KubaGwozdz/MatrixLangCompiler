@@ -39,19 +39,9 @@ class SymbolTable(object):
             return ret
         except:
             return None
-    #
 
     def delete(self, name):
         self.symbols.pop(name)
-
-    def getGlobal(self, name):
-        if self.get(name) is None:
-            if self.parent is not None:
-                return self.parent.getGlobal(name)
-            else:
-                return None
-        else:
-            return self.get(name)
 
     def findVar(self, name):
         for symbol in self.symbols:

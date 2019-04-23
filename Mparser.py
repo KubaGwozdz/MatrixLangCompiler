@@ -96,11 +96,12 @@ class Mparser(object):
 
     def p_for_instr(self, p):
         """for_instr : FOR ID '=' range_instr instruction"""
-        p[0] = AST.ForInstr(p[2], p[4], [p[5]], p.lineno(1))
+        p[0] = AST.ForInstr(p[2], p[4], p[5], p.lineno(1))
 
     def p_while_instr(self, p):
         """while_instr : WHILE '(' condition ')' instruction"""
-        p[0] = AST.WhileInstr(p[3], [p[5]], p.lineno(1))
+        p[0] = AST.WhileInstr(p[3], p[5], p.lineno(1))
+
 
     def p_break_instr(self, p):
         """break_instr : BREAK ';' """
@@ -115,15 +116,15 @@ class Mparser(object):
         p[0] = AST.ReturnInstr(p[2],p.lineno(1))
 
     def p_eye_instr(self, p):
-        """eye_instr : EYE '(' INTNUM ')'"""
+        """eye_instr : EYE '(' int ')'"""
         p[0] = AST.EyeInstr(p[3])
 
     def p_zeros_instr(self, p):
-        """zeros_instr : ZEROS '(' INTNUM ')' """
+        """zeros_instr : ZEROS '(' int ')' """
         p[0] = AST.ZerosInstr(p[3])
 
     def p_ones_instr(self, p):
-        """ones_instr : ONES '(' INTNUM ')' """
+        """ones_instr : ONES '(' int ')' """
         p[0] = AST.OnesInstr(p[3])
 
     def p_assignment(self, p):
@@ -133,7 +134,7 @@ class Mparser(object):
         if(len(p)<6):
             p[0] = AST.AssInstr(p[2], p[1], p[3], p.lineno(1))
         else:
-            p[0] = AST.AssTabInstr(p[7], p[1], p[3], p[5], p[8], p.lineno(1))
+            p[0] = AST.AssTabInstr(p[7], p[1], AST.IntNum(p[3]), AST.IntNum(p[5]), p[8], p.lineno(1))
 
     def p_assign_ops(self, p):
         """assign_ops : SUBASSIGN
@@ -201,7 +202,7 @@ class Mparser(object):
 
     def p_string(self, p):
         """ string : STRING"""
-        p[0] = AST.String(p[1], p.lineno(1))
+        p[0] = AST.String(p[1])
 
     #------ matrix parse: ------
 
@@ -262,9 +263,9 @@ class Mparser(object):
         """NUMBER : INTNUM
                   | FLOATNUM"""
         if(isinstance(p[1], int)):
-            p[0] = AST.IntNum(p[1], p.lineno(1))
+            p[0] = AST.IntNum(p[1])
         else:
-            p[0] = AST.FloatNum(p[1], p.lineno(1))
+            p[0] = AST.FloatNum(p[1])
 
     #------ matrix operations: ------
 

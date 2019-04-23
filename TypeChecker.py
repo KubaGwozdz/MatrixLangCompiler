@@ -118,12 +118,12 @@ class TypeChecker(NodeVisitor):
 
 
     def visit_RangeInstr(self, node, table):
-        frm_t = self.visit(node.frm)
-        to_t = self.visit(node.to)
+        frm_t = self.visit(node.frm, table)
+        to_t = self.visit(node.to, table)
         if frm_t != to_t:
             node.isValid = False
             print("Unmatching range types of: {} in line {}.".format(node.left, node.parent.line))
-        return frm_t
+        return node.frm.type
 
     def visit_CondInstr(self, node, table):
         type_l = self.visit(node.expr_l, table)

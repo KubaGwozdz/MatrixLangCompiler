@@ -144,11 +144,15 @@ class Mparser(object):
         p[0] = p[1]
 
     def p_range_instr(self, p):
-        """range_instr : INTNUM ':' INTNUM
-                       | INTNUM ':' ID
+        """range_instr : int ':' int
+                       | int ':' ID
                        | ID ':' ID
-                       | ID ':' INTNUM"""
+                       | ID ':' int"""
         p[0] = AST.RangeInstr(p[1], p[3])
+
+    def p_int(self, p):
+        """int : INTNUM"""
+        p[0] = AST.IntNum(p[1])
 
     def p_condition(self, p):
         """condition : expression EQ expression
@@ -164,11 +168,11 @@ class Mparser(object):
                         | FLOATNUM
                         | ID"""
         if(isinstance(p[1], int)):
-            p[0] = AST.IntNum(p[1], p.lineno(1))
+            p[0] = AST.IntNum(p[1])
         elif(isinstance(p[1], float)):
-            p[0] = AST.FloatNum(p[1], p.lineno(1))
+            p[0] = AST.FloatNum(p[1])
         elif(isinstance(p[1], str)):
-            p[0] = AST.Variable(p[1], p.lineno(1))
+            p[0] = AST.Variable(p[1])
 
     #------ expressions: ------
 
@@ -270,5 +274,8 @@ class Mparser(object):
                   | matrix MATRIX_TIMES matrix
                   | matrix MATRIX_DIVIDE matrix'''
         p[0] = AST.Matrix_bin_ops(p[1], p[2], p[3])
+
+
+
 
 #parser = yacc.yacc(start='program')

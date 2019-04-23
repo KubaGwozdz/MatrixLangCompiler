@@ -25,27 +25,23 @@ class InstructionList(Node):
 
 
 class IntNum(Node):
-    def __init__(self, value, line):
+    def __init__(self, value,):
         self.value = value
-        self.line = line
 
 
 class FloatNum(Node):
-    def __init__(self, value, line):
+    def __init__(self, value):
         self.value = value
-        self.line = line
 
 
 class String(Node):
-    def __init__(self, val, line):
+    def __init__(self, val):
         self.val = val
-        self.line = line
 
 
 class Variable(Node):
-    def __init__(self, name, line):
+    def __init__(self, name):
         self.name = name
-        self.line = line
 
 
 class BinExpr(Node):

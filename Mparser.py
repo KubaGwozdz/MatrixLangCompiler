@@ -9,7 +9,6 @@ class Mparser(object):
         self.scanner = Scanner()
         self.scanner.build()
 
-
     tokens = Scanner.tokens
 
     precedence = (
@@ -26,7 +25,6 @@ class Mparser(object):
         ("left", '\'')
     )
 
-
     def p_error(self, p):
         if p:
             print("Syntax error at line {0} : LexToken({1}, '{2}')".format(p.lineno, p.type, p.value))
@@ -35,19 +33,16 @@ class Mparser(object):
             print("Unexpected end of input")
             p[0] = AST.Error
 
-
     def p_program(self, p):
         """program : instructions_opt"""
         p[0] = AST.Program(p[1])
         print(AST.Program(p[1]))
-
 
     #------ instructions: ------
     def p_instructions_opt(self, p):
         """instructions_opt : instructions
                             | """
         p[0] = p[1]
-
 
     def p_instructions(self, p):
         """instructions : instructions instruction
@@ -59,7 +54,6 @@ class Mparser(object):
             p[0] = AST.InstructionList()
             p[0].add_instruction(p[1])
 
-
     def p_instruction(self, p):
         """instruction : print_instr
                        | if_instr
@@ -70,16 +64,14 @@ class Mparser(object):
                        | return_instr
                        | assignment
                        | '{' instructions '}' """
-        if(p[1] == '{'): #TODO: zapytać o compound, czy jest różnica z for { ... } a { ... }
+        if (p[1] == '{'):  #TODO: zapytać o compound, czy jest różnica z for { ... } a { ... }
             p[0] = p[2]
         else:
             p[0] = p[1]
 
-
     def p_print_instr(self, p):
         """print_instr : PRINT multi_print ';'"""
-        p[0] = AST.PrintInstr(p[2])
-
+        p[0] = AST.PrintInstr(p[2],p.lineno)
 
     def p_multi_print(self, p):
         """multi_print : multi_print ',' expression
@@ -102,47 +94,37 @@ class Mparser(object):
         else:
             p[0] = AST.IfInstr(p[3], p[5])
 
-
     def p_for_instr(self, p):
         """for_instr : FOR ID '=' range_instr instruction"""
         p[0] = AST.ForInstr(p[2], p[4], [p[5]])
-
-
 
     def p_while_instr(self, p):
         """while_instr : WHILE '(' condition ')' instruction"""
         p[0] = AST.WhileInstr(p[3], [p[5]])
 
-
     def p_break_instr(self, p):
         """break_instr : BREAK ';' """
         p[0] = AST.BreakInstr()
-
 
     def p_cont_instr(self, p):
         """cont_instr : CONTINUE ';' """
         p[0] = AST.ContinueInstr()
 
-
     def p_return_instr(self, p):
         """return_instr : RETURN expression ';'"""
-        p[0] = AST.ReturnInstr(p[2])
-
+        p[0] = AST.ReturnInstr(p[2],p.lineno)
 
     def p_eye_instr(self, p):
         """eye_instr : EYE '(' INTNUM ')'"""
         p[0] = AST.EyeInstr(p[3])
 
-
     def p_zeros_instr(self, p):
         """zeros_instr : ZEROS '(' INTNUM ')' """
         p[0] = AST.ZerosInstr(p[3])
 
-
     def p_ones_instr(self, p):
         """ones_instr : ONES '(' INTNUM ')' """
         p[0] = AST.OnesInstr(p[3])
-
 
     def p_assignment(self, p):
         """assignment : ID assign_ops matrix ';'
@@ -153,8 +135,6 @@ class Mparser(object):
         else:
             p[0] = AST.AssTabInstr(p[7], p[1], p[3], p[5], p[8])
 
-
-
     def p_assign_ops(self, p):
         """assign_ops : SUBASSIGN
                       | ADDASSIGN
@@ -163,14 +143,12 @@ class Mparser(object):
                       | '=' """
         p[0] = p[1]
 
-
     def p_range_instr(self, p):
         """range_instr : INTNUM ':' INTNUM
                        | INTNUM ':' ID
                        | ID ':' ID
                        | ID ':' INTNUM"""
         p[0] = AST.RangeInstr(p[1], p[3])
-
 
     def p_condition(self, p):
         """condition : expression EQ expression
@@ -181,27 +159,22 @@ class Mparser(object):
                      | expression '<' expression"""
         p[0] = AST.CondInstr(p[1], p[2], p[3])
 
-
     def p_number_or_id(self, p):
         """number_or_id : INTNUM
                         | FLOATNUM
                         | ID"""
         if(isinstance(p[1], int)):
-            p[0] = AST.IntNum(p[1])
+            p[0] = AST.IntNum(p[1], p.lineno)
         elif(isinstance(p[1], float)):
-            p[0] = AST.FloatNum(p[1])
+            p[0] = AST.FloatNum(p[1], p.lineno)
         elif(isinstance(p[1], str)):
-            p[0] = AST.Variable(p[1])
-
-
-
+            p[0] = AST.Variable(p[1], p.lineno)
 
     #------ expressions: ------
 
     def p_expression_group(self, p):
         """expression : '(' expression ')'"""
         p[0] = p[2]
-
 
     def p_binary_operators(self, p):
         """ expression : expression '+' expression
@@ -216,18 +189,15 @@ class Mparser(object):
                        | zeros_instr
                        | eye_instr"""
         if(len(p) == 4):
-            p[0] = AST.BinExpr(p[2], p[1], p[3])
+            p[0] = AST.BinExpr(p[2], p[1], p[3], p.lineno)
         elif(len(p) == 3):
             p[0] = AST.NegatedExpr(p[2])
         else:
             p[0] = p[1]
 
-
     def p_string(self, p):
         """ string : STRING"""
-        p[0] = AST.String(p[1])
-
-
+        p[0] = AST.String(p[1], p.lineno)
 
     #------ matrix parse: ------
 
@@ -240,17 +210,14 @@ class Mparser(object):
         else:
             p[0] = p[1]
 
-
     def p_matrix_transp(self, p):
         """matrix_transp : matrix "'" """
         p[0] = AST.MatrixTransp(p[1])
-
 
     def p_body(self, p):
         '''body : rows_with_brackets
                 | rows_with_semicolons'''
         p[0] = p[1]
-
 
     def p_rows_with_brackets(self, p):
         '''rows_with_brackets : '[' row ']'
@@ -264,7 +231,6 @@ class Mparser(object):
         else:
             p[0].append(p[2])
 
-
     def p_rows_with_semicolons(self, p):
         '''rows_with_semicolons : row
                                 | rows_with_semicolons ';' row'''
@@ -277,7 +243,6 @@ class Mparser(object):
         else:
             p[0].append(p[1])
 
-
     def p_row(self, p):
         """row : NUMBER
                | row ',' NUMBER """
@@ -289,16 +254,13 @@ class Mparser(object):
         else:
             p[0].append(p[1])
 
-
     def p_number(self, p):
         """NUMBER : INTNUM
                   | FLOATNUM"""
         if(isinstance(p[1], int)):
-            p[0] = AST.IntNum(p[1])
+            p[0] = AST.IntNum(p[1], p.lineno)
         else:
-            p[0] = AST.FloatNum(p[1])
-
-
+            p[0] = AST.FloatNum(p[1], p.lineno)
 
     #------ matrix operations: ------
 
@@ -308,7 +270,5 @@ class Mparser(object):
                   | matrix MATRIX_TIMES matrix
                   | matrix MATRIX_DIVIDE matrix'''
         p[0] = AST.Matrix_bin_ops(p[1], p[2], p[3])
-
-
 
 #parser = yacc.yacc(start='program')

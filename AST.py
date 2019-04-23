@@ -25,30 +25,35 @@ class InstructionList(Node):
 
 
 class IntNum(Node):
-    def __init__(self, value):
+    def __init__(self, value, line):
         self.value = value
+        self.line = line
 
 
 class FloatNum(Node):
-    def __init__(self, value):
+    def __init__(self, value, line):
         self.value = value
+        self.line = line
 
 
 class String(Node):
-    def __init__(self, val):
+    def __init__(self, val, line):
         self.val = val
+        self.line = line
 
 
 class Variable(Node):
-    def __init__(self, name):
+    def __init__(self, name, line):
         self.name = name
+        self.line = line
 
 
 class BinExpr(Node):
-    def __init__(self, op, left, right):
+    def __init__(self, op, left, right, line):
         self.op = op
         self.left = left
         self.right = right
+        self.line = line
 
 
 class NegatedExpr(Node):
@@ -57,10 +62,11 @@ class NegatedExpr(Node):
 
 
 class RelExpr(Node):
-    def __init__(self, op, left, right):
+    def __init__(self, op, left, right, line):
         self.op = op
         self.left = left
         self.right = right
+        self.line = line
 
 
 class AssInstr(Node):
@@ -93,7 +99,7 @@ class CondInstr(Node):
 
 
 class IfInstr(Node):
-    def __init__(self, cond, instr1, instr2 = None):
+    def __init__(self, cond, instr1, instr2=None):
         self.cond = cond
         self.instr1 = instr1
         self.instr2 = instr2
@@ -121,13 +127,15 @@ class ContinueInstr(Node):
 
 
 class ReturnInstr(Node):
-    def __init__(self, expr):
+    def __init__(self, expr, line):
         self.expr = expr
+        self.line = line
 
 
 class PrintInstr(Node):
-    def __init__(self, expr):
+    def __init__(self, expr, line):
         self.expr = expr
+        self.line = line
 
 
 #class CompoundInstr(Node):

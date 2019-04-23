@@ -75,16 +75,15 @@ class TypeChecker(NodeVisitor):
         return 'String'
 
     def visit_Variable(self, node, table):
-        definition = table.getGlobal(node.name)
+        definition = table.get(node.name)
         if definition is None:
-            self.isValid = False
-            print("Undefined symbol {} in line {}".format(node.name, node.line))
+            return definition
         else:
             return definition.type
 
     def visit_BinExpr(self, node, table):       #TODO: czemu linia z parsera = 0?
-        lhs = self.visit(node.left)
-        rhs = self.visit(node.right)
+        lhs = self.visit(node.left, table)
+        rhs = self.visit(node.right, table)
         op = node.op
         if ttype[op][lhs][rhs] is None:
             self.isValid = False
@@ -98,18 +97,18 @@ class TypeChecker(NodeVisitor):
         pass'''
 
     def visit_AssInstr(self, node, table):
-        definition = table.getGlobal(node.left)
+        definition = self.visit(node.left, table)
         node.right.setParent(node.left)
-        type = self.visit(node.right)
+        type = self.visit(node.right, table)
         if definition is None:
-            table.put(node.left, VariableSymbol(node.left, type))
-        elif type != definition.type and (definition.type != "float" and definition != "int" and definition != "string"):
+            table.put(node.left.name, VariableSymbol(node.left.name, type))
+        elif type != definition or (definition != "float" and definition != "int" and definition != "string" and definition != "matrix"):
             self.isValid = False
-            print("Bad assignment of {} to {} in line {}.".format(type, definition.type, node.line))
+            print("Bad assignment of {} to {} in line {}.".format(type, definition, node.left.line))
 
 
     def visit_AssTabInstr(self, node, table):
-        definition = table.getGlobal(node.left)
+        definition = self.visit(node.left, table)
         #type = self.visit(node.right)
         if definition is None:
             self.isValid = False
@@ -130,9 +129,9 @@ class TypeChecker(NodeVisitor):
         frm_t = self.visit(node.frm, table)
         to_t = self.visit(node.to, table)
         if frm_t != to_t:
-            node.isValid = False
-            print("Unmatching range types of: {} in line {}.".format(node.left, node.parent.line))
-        return node.frm.type
+            self.isValid = False
+            print("Unmatching range types of: {} and {} in line {}.".format(frm_t, to_t, node.parent.line))
+        return frm_t
 
     def visit_CondInstr(self, node, table):
         type_l = self.visit(node.expr_l, table)
@@ -155,6 +154,8 @@ class TypeChecker(NodeVisitor):
         state, msg = self.visit(node.cond, table)
         if state == False:
             print(msg + "in line {}.".format(node.line))
+        for child in node.instr:
+            child.setParent(node)
         if type(node.instr) == list:
             for child in node.instr:
                 child.setParent(node)
@@ -164,7 +165,8 @@ class TypeChecker(NodeVisitor):
 
     def visit_ForInstr(self, node, table):
         id_t = table.getGlobal(node.id)
-        range_t = self.visit(node.range)
+        node.range.setParent(node)
+        range_t = self.visit(node.range, table)
         if id_t is not None:
             print("Iterator {} already in use, line: ".format(node.id, node.line))
         else:

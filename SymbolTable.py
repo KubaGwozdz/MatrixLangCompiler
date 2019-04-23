@@ -53,6 +53,12 @@ class SymbolTable(object):
         else:
             return self.get(name)
 
+    def findVar(self, name):
+        for symbol in self.symbols:
+            if symbol.name == name:
+                return symbol.type
+        return None
+
     def getParentScope(self):
         return self.parent
     #

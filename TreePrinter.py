@@ -62,9 +62,9 @@ class TreePrinter:
     @addToClass(AST.AssTabInstr)
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + self.op + "\n" + INDENT_TOKEN * (indent+1) + "REF" + "\n" \
-               + INDENT_TOKEN * (indent+2) + self.left + "\n" \
-               + INDENT_TOKEN * (indent+2) + str(self.frm) + "\n" \
-               + INDENT_TOKEN * (indent+2) + str(self.to) + "\n"\
+               + INDENT_TOKEN * (indent+2) + self.left.printTree(indent) \
+               + INDENT_TOKEN * (indent+2) + self.frm.printTree(indent) \
+               + INDENT_TOKEN * (indent+2) + self.to.printTree(indent) \
                + self.right.printTree(indent + 1)
 
     @addToClass(AST.RangeInstr)

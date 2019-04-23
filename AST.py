@@ -1,5 +1,5 @@
 class Node(object):
-    def __init__(self,parent=False):
+    def __init__(self,parent=None):
         self.parent = parent
 
     def __str__(self):
@@ -28,23 +28,27 @@ class InstructionList(Node):
 
 
 class IntNum(Node):
-    def __init__(self, value,):
+    def __init__(self, value, line):
         self.value = value
+        self.line = line
 
 
 class FloatNum(Node):
-    def __init__(self, value):
+    def __init__(self, value, line):
         self.value = value
+        self.line = line
 
 
 class String(Node):
-    def __init__(self, val):
+    def __init__(self, val, line):
         self.val = val
+        self.line = line
 
 
 class Variable(Node):
-    def __init__(self, name):
+    def __init__(self, name, line):
         self.name = name
+        self.line = line
 
 
 class BinExpr(Node):

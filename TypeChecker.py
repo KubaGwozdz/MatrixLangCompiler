@@ -75,8 +75,6 @@ class TypeChecker(NodeVisitor):
         return 'String'
 
     def visit_Variable(self, node, table):
-        '''table.put(node.name, VariableSymbol(node.name, node.type))
-        return node.type'''
         definition = table.getGlobal(node.name)
         if definition is None:
             self.isValid = False
@@ -101,6 +99,7 @@ class TypeChecker(NodeVisitor):
 
     def visit_AssInstr(self, node, table):
         definition = table.getGlobal(node.left)
+        node.right.setParent(node.left)
         type = self.visit(node.right)
         if definition is None:
             table.put(node.left, VariableSymbol(node.left, type))
@@ -115,7 +114,17 @@ class TypeChecker(NodeVisitor):
         if definition is None:
             self.isValid = False
             print("Trying to modify unknown matrix: {} in line {}.".format(node.left, node.line))
-
+        else:
+            if node.parent is None:
+                self.isValid = False
+                print("Trying to modify unknown matrix: {} in line {}.".format(node.left, node.line))
+            else:
+                rows = len(node.parent.body)
+                columns = len(node.parent.body[0])
+                if node.frm >= rows:
+                    print("Row out of matrix bounds: line {}".format(0))
+                if node.to >= columns:
+                    print("Column out of matrix bounds: line {}".format(0))
 
     def visit_RangeInstr(self, node, table):
         frm_t = self.visit(node.frm, table)
@@ -146,8 +155,11 @@ class TypeChecker(NodeVisitor):
         state, msg = self.visit(node.cond, table)
         if state == False:
             print(msg + "in line {}.".format(node.line))
-        for child in node.instr:
-            child.setParent(True)
+        if type(node.instr) == list:
+            for child in node.instr:
+                child.setParent(node)
+        else:
+            node.instr.setParent(node)
         self.visit(node.instr, table)
 
     def visit_ForInstr(self, node, table):
@@ -157,35 +169,61 @@ class TypeChecker(NodeVisitor):
             print("Iterator {} already in use, line: ".format(node.id, node.line))
         else:
             table.put(node.id, VariableSymbol(node.id, range_t))
-
+        if type(node.instr) == list:
+            for child in node.instr:
+                child.setParent(node)
+        else:
+            node.instr.setParent(node)
         self.visit(node.instr, table)
 
-
     def visit_BreakInstr(self, node, table):
-        if node.parent:
+        if node.parent is not None:
             pass
         else:
             print("Break without loop: line {}".format(0))
 
     def visit_ContinueInstr(self, node, table):
-        pass
+        if node.parent is not None:
+            pass
+        else:
+            print("Continue without loop: line {}".format(0))
 
     def visit_ReturnInstr(self, node, table):
-        pass
+        if node.parent is not None:
+            pass
+        else:
+            print("Return without loop: line {}".format(0))
 
     def visit_PrintInstr(self, node, table):
         return self.visit(node.instructions, table)
 
     def visit_EyeInstr(self, node, table):
-        pass
+        type = self.visit(node.intnum, table)
+        if type == "int":
+            pass
+        else:
+            print("Wrong argument to eye instruction: line {}".format(0))
 
     def visit_ZerosInstr(self, node, table):
-        pass
+        type = self.visit(node.intnum, table)
+        if type == "int":
+            pass
+        else:
+            print("Wrong argument to zeros instruction: line {}".format(0))
 
     def visit_OnesInstr(self, node, table):
-        pass
+        type = self.visit(node.intnum, table)
+        if type == "int":
+            pass
+        else:
+            print("Wrong argument to ones instruction: line {}".format(0))
 
     def visit_Matrix(self, node, table):
+        length = len(node.body[0])
+        for i in node.body:
+            if len(i) != length:
+                print("Implementing matrix with diffrent size vectors: line {}".format(0))
+                break
         pass
 
     def visit_MatrixTransp(self, node, table):

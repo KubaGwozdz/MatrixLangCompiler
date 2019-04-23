@@ -206,6 +206,8 @@ class TypeChecker(NodeVisitor):
         else:
             print("Wrong argument to eye instruction: line {}".format(node.line))
             self.isValid = False
+        return "matrix"
+
 
     def visit_ZerosInstr(self, node, table):
         type = self.visit(node.intnum, table)
@@ -213,6 +215,7 @@ class TypeChecker(NodeVisitor):
             pass
         else:
             print("Wrong argument to zeros instruction: line {}".format(node.line))
+        return "matrix"
 
     def visit_OnesInstr(self, node, table):
         type = self.visit(node.intnum, table)
@@ -220,6 +223,7 @@ class TypeChecker(NodeVisitor):
             pass
         else:
             print("Wrong argument to ones instruction: line {}".format(node.line))
+        return "matrix"
 
     def visit_Matrix(self, node, table):
         length = len(node.body[0])

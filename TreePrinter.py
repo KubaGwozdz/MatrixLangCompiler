@@ -131,15 +131,15 @@ class TreePrinter:
 
     @addToClass(AST.EyeInstr)
     def printTree(self, indent=0):
-        return INDENT_TOKEN * indent + "EYE\n" + INDENT_TOKEN * (indent + 1) + str(self.intnum) + "\n"
+        return INDENT_TOKEN * indent + "EYE\n" + INDENT_TOKEN * (indent) + self.intnum.printTree(indent) + "\n"
 
     @addToClass(AST.ZerosInstr)
     def printTree(self, indent=0):
-        return INDENT_TOKEN * indent + "ZEROS\n" + INDENT_TOKEN * (indent + 1) + str(self.intnum) + "\n"
+        return INDENT_TOKEN * indent + "ZEROS\n" + INDENT_TOKEN * (indent) + self.intnum.printTree(indent) + "\n"
 
     @addToClass(AST.OnesInstr)
     def printTree(self, indent=0):
-        return INDENT_TOKEN * indent + "ONES\n" + INDENT_TOKEN * (indent + 1) + str(self.intnum) + "\n"
+        return INDENT_TOKEN * indent + "ONES\n" + INDENT_TOKEN * (indent) + self.intnum.printTree(indent) + "\n"
 
     @addToClass(AST.Matrix)
     def printTree(self, indent=0):
@@ -149,19 +149,19 @@ class TreePrinter:
         for row in body:
             ret += INDENT_TOKEN * (indent+1) + "VECTOR\n"
             for val in row:
-                ret += INDENT_TOKEN * (indent + 2) + str(val)
+                ret += INDENT_TOKEN * (indent + 1) + val.printTree(indent)
         return ret
 
     @addToClass(AST.MatrixTransp)
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + "TRANSPOSE\n" \
-               + INDENT_TOKEN * (indent + 1) + self.matrix + "\n"
+                + self.matrix.printTree(indent+1)
 
     @addToClass(AST.Matrix_bin_ops)
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + self.op + "\n" \
-               + INDENT_TOKEN * (indent + 1) + self.left + "\n" \
-               + self.right.printTree(indent + 1)
+               + self.left.printTree(indent+1) \
+               + self.right.printTree(indent+1)
 
     @addToClass(AST.Program)
     def printTree(self, indent=0):

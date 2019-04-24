@@ -11,6 +11,14 @@ class VariableSymbol(Symbol):
         self.type = type
 
 
+class MatrixSymbol(Symbol):
+    def __init__(self,name,type,row=None,column=None):
+        self.name = name
+        self.type = type
+        self.row = row
+        self.column = column
+
+
 class FunctionSymbol(Symbol):
     def __init__(self, name, type, table):
         self.name = name
@@ -43,11 +51,14 @@ class SymbolTable(object):
     def delete(self, name):
         self.symbols.pop(name)
 
-    def findVar(self, name):
-        for symbol in self.symbols:
-            if symbol.name == name:
-                return symbol.type
-        return None
+    def getMatrixSize(self,name):
+        try:
+            matrix = self.symbols[name]
+            row = matrix.row
+            column = matrix.column
+            return row,column
+        except:
+            return None
 
     def getParentScope(self):
         return self.parent

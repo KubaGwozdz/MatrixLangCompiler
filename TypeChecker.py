@@ -91,10 +91,12 @@ class TypeChecker(NodeVisitor):
 
     def visit_AssInstr(self, node, table):
         definition = self.visit(node.left, table)
-        node.right.setParent(node.left)
         type = self.visit(node.right, table)
         if definition is None:
-            table.put(node.left.name, VariableSymbol(node.left.name, type))
+            if type == 'matrix':
+                table.put(node.left.name, MatrixSymbol(node.left.name, type, len(node.right.body), len(node.right.body[0])))
+            else:
+                table.put(node.left.name, VariableSymbol(node.left.name, type))
         elif type != definition or (definition != "float" and definition != "int" and definition != "string" and definition != "matrix"):
             self.isValid = False
             print("Bad assignment of {} to {} in line {}.".format(type, definition, node.left.line))
@@ -106,16 +108,13 @@ class TypeChecker(NodeVisitor):
             self.isValid = False
             print("Trying to modify unknown matrix: {} in line {}.".format(node.left, node.line))
         else:
-            if node.parent is None:
+            row, column = table.getMatrixSize(node.left.name)
+            if node.frm.value >= row:
                 self.isValid = False
-                print("Trying to modify unknown matrix: {} in line {}.".format(node.left, node.line))
-            else:
-                rows = len(node.parent.body)
-                columns = len(node.parent.body[0])
-                if node.frm >= rows:
-                    print("Row out of matrix bounds: line {}".format(0))
-                if node.to >= columns:
-                    print("Column out of matrix bounds: line {}".format(0))
+                print("Row out of matrix bounds: line {}".format(node.left.line))
+            if node.to.value >= column:
+                self.isValid = False
+                print("Column out of matrix bounds: line {}".format(node.left.line))
 
     def visit_RangeInstr(self, node, table):
         frm_t = self.visit(node.frm, table)

@@ -94,7 +94,10 @@ class TypeChecker(NodeVisitor):
         type = self.visit(node.right, table)
         if definition is None:
             if type == 'matrix':
-                table.put(node.left.name, MatrixSymbol(node.left.name, type, len(node.right.body), len(node.right.body[0])))
+                if hasattr(node.right, "body"):
+                    table.put(node.left.name, MatrixSymbol(node.left.name, type, len(node.right.body), len(node.right.body[0])))
+                else:
+                    table.put(node.left.name, MatrixSymbol(node.left.name, type, node.right.intnum, node.right.intnum))
             else:
                 table.put(node.left.name, VariableSymbol(node.left.name, type))
         elif type != definition or (definition != "float" and definition != "int" and definition != "string" and definition != "matrix"):

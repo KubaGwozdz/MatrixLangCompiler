@@ -25,6 +25,14 @@ ttype['*']['string']['int'] = 'string'
 for op in ['<', '>', '<=', '>=', '==', '!=']:
     ttype[op]['string']['string'] = 'int'
 
+for op in ['.+','.-','./','.*']:
+    ttype[op]['matrix']['matrix'] = 'matrix'
+
+for op in ['+','*']:
+    ttype[op]['matrix']['int'] = 'matrix'
+    ttype[op]['matrix']['float'] = 'matrix'
+    ttype[op]['int']['matrix'] = 'matrix'
+
 
 class NodeVisitor(object):
 
@@ -88,7 +96,6 @@ class TypeChecker(NodeVisitor):
     def visit_NegatedExpr(self, node, table):
         pass
 
-
     def visit_AssInstr(self, node, table):
         definition = self.visit(node.left, table)
         type = self.visit(node.right, table)
@@ -104,12 +111,11 @@ class TypeChecker(NodeVisitor):
             self.isValid = False
             print("Bad assignment of {} to {} in line {}.".format(type, definition, node.left.line))
 
-
     def visit_AssTabInstr(self, node, table):
         definition = self.visit(node.left, table)
         if definition is None:
             self.isValid = False
-            print("Trying to modify unknown matrix: {} in line {}.".format(node.left, node.line))
+            print("Trying to modify unknown matrix: {} in line {}.".format(node.left, node.left.line))
         else:
             row, column = table.getMatrixSize(node.left.name)
             if node.frm.value >= row.value:
@@ -236,12 +242,32 @@ class TypeChecker(NodeVisitor):
         return "matrix"
 
     def visit_MatrixTransp(self, node, table):
-        pass
+        type = self.visit(node.matrix, table)
+        if type != 'matrix':
+            print("Trying to transpose not matrix: line {}".format(node.matrix.line))
 
     def visit_Matrix_bin_ops(self, node, table):
-        pass
+        lhs = self.visit(node.left,table)
+        rhs = self.visit(node.right,table)
+        if ttype[node.op][lhs][rhs] is None:
+            self.isValid = False
+            print("Bad matrix expression {} in line {}".format(node.op, node.left.line))
+        else:
+            lr,lc = table.getMatrixSize(node.left.name)
+            rr,rc = table.getMatrixSize(node.right.name)
+            if node.op == '.*':
+                if lc != rr:
+                    self.isValid = False
+                    print("Trying to {} matrixes with wrong sizes in line {}".format(node.op, node.left.line))
+            elif node.op == '.+' or node.op == '.-':
+                if lc != rc or lr != rr:
+                    self.isValid = False
+                    print("Trying to {} matrixes with wrong sizes in line {}".format(node.op, node.left.line))
+            elif node.op == './':
+                if lc != lr or rc != rr:
+                    self.isValid = False
+                    print("Trying to {} matrixes with wrong sizes in line {}".format(node.op, node.left.line))
+        return ttype[op][lhs][rhs]
 
-"""
-    def visit_Error(self, node, table):
-        pass
-"""
+    '''def visit_Error(self, node, table):
+        pass'''

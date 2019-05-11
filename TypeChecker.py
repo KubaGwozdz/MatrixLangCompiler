@@ -112,10 +112,10 @@ class TypeChecker(NodeVisitor):
             print("Trying to modify unknown matrix: {} in line {}.".format(node.left, node.line))
         else:
             row, column = table.getMatrixSize(node.left.name)
-            if node.frm.value >= row:
+            if node.frm.value >= row.value:
                 self.isValid = False
                 print("Row out of matrix bounds: line {}".format(node.left.line))
-            if node.to.value >= column:
+            if node.to.value >= column.value:
                 self.isValid = False
                 print("Column out of matrix bounds: line {}".format(node.left.line))
 
@@ -241,5 +241,7 @@ class TypeChecker(NodeVisitor):
     def visit_Matrix_bin_ops(self, node, table):
         pass
 
+"""
     def visit_Error(self, node, table):
         pass
+"""

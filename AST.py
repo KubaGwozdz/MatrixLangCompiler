@@ -215,10 +215,11 @@ class Matrix_bin_ops(Node):
         self.right = right
         super().__init__()
 
-
+"""
 class Error(Node):
     def __init__(self, lineno=None, type=None, value=None):
         self.lineno = lineno
         self.type = type
         self.value = value
         super().__init__()
+"""

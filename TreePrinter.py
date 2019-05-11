@@ -167,6 +167,8 @@ class TreePrinter:
     def printTree(self, indent=0):
         return self.instructions.printTree(indent)
 
+"""
     @addToClass(AST.Error)
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + "Syntax error at line" + str(self.lineno) + str(self.type) + " " + str(self.value) + "\n\n"
+"""

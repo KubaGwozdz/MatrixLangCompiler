@@ -22,16 +22,17 @@ class Mparser(object):
         ("left", 'MATRIX_PLUS', 'MATRIX_MINUS'),
         ("left", '*', '/'),
         ("left", 'MATRIX_TIMES', 'MATRIX_DIVIDE'),
-        ("left", '\'')
+        ("left", '\''),
+        ("left", 'UMINUS')
     )
 
     def p_error(self, p):
         if p:
             print("Syntax error at line {0} : LexToken({1}, '{2}')".format(p.lineno, p.type, p.value))
-            p[0] = AST.Error(p.lineno, p.type, p.value)
+            #p[0] = AST.Error(p.lineno, p.type, p.value)
         else:
             print("Unexpected end of input")
-            p[0] = AST.Error
+            #p[0] = AST.Error
 
     def p_program(self, p):
         """program : instructions_opt"""
@@ -64,7 +65,7 @@ class Mparser(object):
                        | return_instr
                        | assignment
                        | '{' instructions '}' """
-        if (p[1] == '{'):  #TODO: zapytać o compound, czy jest różnica z for { ... } a { ... }
+        if (p[1] == '{'):
             p[0] = p[2]
         else:
             p[0] = p[1]
@@ -86,8 +87,6 @@ class Mparser(object):
 
     def p_if_instr(self, p):
         """if_instr  : IF  '(' condition ')' instruction
-                     | IF '(' condition ')' if_instr
-                     | IF  '(' condition ')' instruction ELSE if_instr
                      | IF  '(' condition ')' instruction ELSE instruction"""
         if(len(p) > 6):
             p[0] = AST.IfInstr(p.lineno(1), p[3], p[5], p[7])
@@ -187,12 +186,13 @@ class Mparser(object):
                        | expression '*' expression
                        | expression '/' expression
                        | number_or_id
-                       | '-' expression
+                       | '-' expression   %prec UMINUS
                        | m_expr
                        | string
                        | ones_instr
                        | zeros_instr
-                       | eye_instr"""
+                       | eye_instr
+                       | matrix """      #TODO: sprawdzic!!!
         if(len(p) == 4):
             p[0] = AST.BinExpr(p[2], p[1], p[3], p.lineno(1))
         elif(len(p) == 3):

@@ -26,6 +26,7 @@ k = 10;
 while(k>0)
     k = k - 1;
 
+
 while(k>0) {
     if(k<5)
         i = 1;

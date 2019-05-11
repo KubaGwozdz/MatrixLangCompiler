@@ -154,8 +154,6 @@ class TypeChecker(NodeVisitor):
         state, msg = self.visit(node.cond, table)
         if state == False:
             print(msg + "in line {}.".format(node.line))
-        for child in node.instr:
-            child.setParent(node)
         if type(node.instr) == list:
             for child in node.instr:
                 child.setParent(node)
@@ -169,7 +167,7 @@ class TypeChecker(NodeVisitor):
         node.range.setParent(node)
         range_t = self.visit(node.range, table)
         if id_t is not None:
-            print("Iterator {} already in use, line: ".format(node.id, node.line))
+            print("Iterator {} already in use, line: {}".format(node.id, node.line))
             self.isValid = False
         else:
             table.put(node.id.name, VariableSymbol(node.id.name, range_t))

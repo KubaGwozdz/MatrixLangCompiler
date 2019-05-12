@@ -34,6 +34,7 @@ for op in ['+','*']:
     ttype[op]['int']['matrix'] = 'matrix'
 
 
+
 class NodeVisitor(object):
 
     def visit(self, node, table=None):
@@ -98,18 +99,30 @@ class TypeChecker(NodeVisitor):
 
     def visit_AssInstr(self, node, table):
         definition = self.visit(node.left, table)
-        type = self.visit(node.right, table)
+        r_type = self.visit(node.right, table)
         if definition is None:
-            if type == 'matrix':
+            if r_type == 'matrix':
                 if hasattr(node.right, "body"):
-                    table.put(node.left.name, MatrixSymbol(node.left.name, type, len(node.right.body), len(node.right.body[0])))
+                    table.put(node.left.name, MatrixSymbol(node.left.name, r_type, len(node.right.body), len(node.right.body[0])))
+                elif isinstance(node.right, AST.BinExpr):
+                    lb_type = self.visit(node.right.left, table)
+                    rb_type = self.visit(node.right.right, table)
+                    if rb_type == 'matrix':
+                        r_matrix = table.get(node.right.right.name)
+                        table.put(node.left.name, MatrixSymbol(node.left.name, r_matrix.type, r_matrix.row, r_matrix.column))
+                    elif lb_type == 'matrix':
+                        l_matrix = table.get(node.right.left.name)
+                        table.put(node.left.name, MatrixSymbol(node.left.name, l_matrix.type, l_matrix.row, l_matrix.column))
+                    else:
+                        print("Matrix assign error in line {}".format(node.left.line))
+                        self.isValid = False
                 else:
-                    table.put(node.left.name, MatrixSymbol(node.left.name, type, node.right.intnum, node.right.intnum))
+                    table.put(node.left.name, MatrixSymbol(node.left.name, r_type, node.right.intnum, node.right.intnum))
             else:
-                table.put(node.left.name, VariableSymbol(node.left.name, type))
-        elif type != definition or (definition != "float" and definition != "int" and definition != "string" and definition != "matrix"):
+                table.put(node.left.name, VariableSymbol(node.left.name, r_type))
+        elif r_type != definition or (definition != "float" and definition != "int" and definition != "string" and definition != "matrix"):
             self.isValid = False
-            print("Bad assignment of {} to {} in line {}.".format(type, definition, node.left.line))
+            print("Bad assignment of {} to {} in line {}.".format(r_type, definition, node.left.line))
 
     def visit_AssTabInstr(self, node, table):
         definition = self.visit(node.left, table)

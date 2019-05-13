@@ -10,14 +10,10 @@ def on(param_name):
 
 
 def when(param_type):
-
-  # f - actual decorator
-  # fn - decorated method, i.e. visit
-  # ff - fn gets replaced by ff in the effect of applying @when decorator
-  # dispatcher is an function object
   def f(fn):
     frame = inspect.currentframe().f_back
-    dispatcher = frame.f_locals[fn.func_name]
+    func_name = fn.func_name if 'func_name' in dir(fn) else fn.__name__
+    dispatcher = frame.f_locals[func_name]
     if not isinstance(dispatcher, Dispatcher):
       dispatcher = dispatcher.dispatcher
     dispatcher.add_target(param_type, fn)
@@ -30,9 +26,9 @@ def when(param_type):
 
 class Dispatcher(object):
   def __init__(self, param_name, fn):
-    frame = inspect.currentframe().f_back.f_back   # these 2 lines
-    top_level = frame.f_locals == frame.f_globals  # seem redundant
-    self.param_index = inspect.getargspec(fn).args.index(param_name)
+    frame = inspect.currentframe().f_back.f_back
+    top_level = frame.f_locals == frame.f_globals
+    self.param_index = self.__argspec(fn).args.index(param_name)
     self.param_name = param_name
     self.targets = {}
 
@@ -44,8 +40,16 @@ class Dispatcher(object):
     else:
       issub = issubclass
       t = self.targets
-      ks = t.iterkeys()
-      return [ t[k](*args, **kw) for k in ks if issub(typ, k) ]
+      ks = iter(t)
+      return [t[k](*args, **kw) for k in ks if issub(typ, k)]
 
   def add_target(self, typ, target):
     self.targets[typ] = target
+
+  @staticmethod
+  def __argspec(fn):
+    # Support for Python 3 type hints requires inspect.getfullargspec
+    if hasattr(inspect, 'getfullargspec'):
+      return inspect.getfullargspec(fn)
+    else:
+      return inspect.getargspec(fn)

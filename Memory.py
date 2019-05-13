@@ -58,3 +58,9 @@ class MemoryStack:
 
     def peek(self):
         return self.stack[-1]
+
+    def delete(self, name):
+        indices = reversed(range(len(self.stack)))
+        for i in indices:
+            if self.stack[i].has_key(name):
+                self.stack[i].dict.pop(name)

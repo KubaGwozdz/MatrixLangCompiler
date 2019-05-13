@@ -27,7 +27,7 @@ class Interpreter(object):
 
     @when(AST.String)
     def visit(self, node):
-        return int(node.val)
+        return node.val
 
     @when(AST.Variable)
     def visit(self, node):
@@ -57,14 +57,33 @@ class Interpreter(object):
     @when(AST.NegatedExpr)
     def visit(self,node):
         val = node.expr.accept(self)
-        return eval("-" + val)
+        return eval("-" + str(val))
 
     @when(AST.AssInstr)
     def visit(self, node):
         expr_accept = node.right.accept(self)
         self.memoryStack.insert(node.left.name, expr_accept)
-        self.memoryStack.set(node.left, expr_accept)
         return expr_accept
+
+    @when(AST.RangeInstr)
+    def visit(self, node):
+        return range(node.frm.accept(self), node.to.accept(self))
+
+    @when(AST.ForInstr)
+    def visit(self, node):
+        my_range = node.range.accept(self)
+        it_name = node.id.accept(self)
+        if it_name is not None:
+            print("for iterator already in use!")
+        else:
+            it_name = node.id.name
+            self.memoryStack.insert(it_name, 0)
+            my_instructions = node.instr.instructions
+            for it in my_range:
+                self.memoryStack.set(it_name, it)
+                for instruction in my_instructions:
+                    instruction.accept(self)
+            self.memoryStack.delete(it_name)
 
     @when(AST.AssTabInstr)
     def visit(self,node):
@@ -77,13 +96,33 @@ class Interpreter(object):
         self.memoryStack.set(node.left.name, expr_accept)
         return expr_accept
 
-    # simplistic while loop interpretation
     @when(AST.WhileInstr)
     def visit(self, node):
-        r = None
         while node.cond.accept(self):
-            r = node.body.accept(self)
-        return r
+            try:
+                node.instr.accept(self)
+            except BreakException:
+                break
+            except ContinueException:
+                pass
+
+    @when(AST.IfInstr)
+    def visit(self, node):
+        if node.cond.accept(self):
+            node.instr1.accept(self)
+        elif node.instr2 is not None:
+            node.instr2.accept(self)
+
+
+    @when(AST.CondInstr)
+    def visit(self, node):
+        return eval(str(node.expr_l.accept(self)) + node.op + str(node.expr_r.accept(self)))
+
+
+    @when(AST.PrintInstr)
+    def visit(self, node):
+        for expr in node.expr:
+            print(expr.accept(self))
 
     @when(AST.BreakInstr)
     def visit(self, node):

@@ -37,7 +37,22 @@ class Interpreter(object):
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
-        return eval("a" + node.op + "b", {"a": r1, "b": r2})
+        if node.op == "+=":
+            r1 += r2
+            return r1
+        elif node.op == "-=":
+            r1 -= r2
+            return r1
+        elif node.op == "*=":
+            r1 += r2
+            return r1
+        elif node.op == "/=":
+            r1 += r2
+        elif node.op == "=":
+            r1 = r2
+            return r1
+        else:
+            return eval("a" + node.op + "b", {"a": r1, "b": r2})
 
     @when(AST.NegatedExpr)
     def visit(self,node):
@@ -53,7 +68,14 @@ class Interpreter(object):
 
     @when(AST.AssTabInstr)
     def visit(self,node):
-        return 0
+        expr_accept = node.right.accept(self)
+        matrix = self.memoryStack.get(node.left.name)
+        row = node.frm.accept(self)
+        col = node.to.accept(self)
+        matrix[row][col] = expr_accept
+        self.memoryStack.insert(node.left.name, expr_accept)
+        self.memoryStack.set(node.left.name, expr_accept)
+        return expr_accept
 
     # simplistic while loop interpretation
     @when(AST.WhileInstr)

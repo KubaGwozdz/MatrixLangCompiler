@@ -17,11 +17,34 @@ class Interpreter(object):
     def visit(self, node):
         pass
 
+    @when(AST.IntNum)
+    def visit(self,node):
+        return int(node.value)
+
+    @when(AST.FloatNum)
+    def visit(self, node):
+        return float(node.value)
+
+    @when(AST.String)
+    def visit(self, node):
+        return int(node.val)
+
+    @when(AST.Variable)
+    def visit(self, node):
+        return self.memoryStack.get(node.name)
+
     @when(AST.BinExpr)
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
         return eval("a" + node.op + "b", {"a": r1, "b": r2})
+
+    @when(AST.NegatedExpr)
+    def visit(self,node):
+        return 0
+
+    
+
 
     @when(AST.AssInstr)
     def visit(self, node):
@@ -36,7 +59,6 @@ class Interpreter(object):
         while node.cond.accept(self):
             r = node.body.accept(self)
         return r
-
 
     @when(AST.BreakInstr)
     def visit(self, node):

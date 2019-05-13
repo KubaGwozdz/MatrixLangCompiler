@@ -73,15 +73,6 @@ class NegatedExpr(Node):
         super().__init__()
 
 
-class RelExpr(Node):
-    def __init__(self, op, left, right, line):
-        self.op = op
-        self.left = left
-        self.right = right
-        self.line = line
-        super().__init__()
-
-
 class AssInstr(Node):
     def __init__(self, op, left, right, line):
         self.op = op

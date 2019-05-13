@@ -43,7 +43,6 @@ class MemoryStack:
     def set(self, name, value):
     # sets variable <name> to value <value>
         indices = reversed(range(len(self.stack)))
-        #indices.reverse()
         for i in indices:
             if self.stack[i].has_key(name):
                 self.stack[i].put(name, value)

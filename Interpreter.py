@@ -100,9 +100,13 @@ class Interpreter(object):
         matrix = self.memoryStack.get(node.left.name)
         row = node.frm.accept(self)
         col = node.to.accept(self)
-        matrix[row][col] = expr_accept
+        line = matrix[row][col].line
+        if isinstance(matrix[row][col].value,int):
+            matrix[row][col] = AST.IntNum(expr_accept,line)
+        elif isinstance(matrix[row][col].value, float):
+            matrix[row][col] = AST.FloatNum(expr_accept, line)
         self.memoryStack.insert(node.left.name, expr_accept)
-        self.memoryStack.set(node.left.name, expr_accept)
+        self.memoryStack.set(node.left.name, matrix)
         return expr_accept
 
     @when(AST.WhileInstr)
@@ -122,11 +126,9 @@ class Interpreter(object):
         elif node.instr2 is not None:
             node.instr2.accept(self)
 
-
     @when(AST.CondInstr)
     def visit(self, node):
         return eval(str(node.expr_l.accept(self)) + node.op + str(node.expr_r.accept(self)))
-
 
     @when(AST.PrintInstr)
     def visit(self, node):
@@ -145,6 +147,43 @@ class Interpreter(object):
     def visit(self, node):
         value = node.expression.accept(self)
         raise ReturnValueException(value)
+
+    @when(AST.Matrix)
+    def visit(self,node):
+        return node.body
+
+    @when(AST.MatrixTransp)
+    def visit(self, node):
+        return node.matrix
+
+    @when(AST.Matrix_bin_ops)
+    def visit(self, node):
+        r1 = node.left.accept(self)
+        r2 = node.right.accept(self)
+        r3 = r1
+        if node.op == ".+":
+            for row in r2:
+                for col in row:
+                    r3[row][col] += r2[row][col] #?
+            return r3
+        elif node.op == ".-":
+            for row in r2:
+                for col in row:
+                    r3[row][col].value -= r2[row][col].value
+            return r3
+        elif node.op == ".*":
+            for row in r3:
+                for col in r3:
+                    r3[row][col].value = 0
+            for row in r1:
+                for col in r1:
+                    r3[row][col].value += r1[row][col].value * r2[col][row].value
+            return r3
+        elif node.op == "./":
+            r1 += r2
+        else:
+            return eval("a" + node.op + "b", {"a": r1, "b": r2})
+
 
     @when(AST.Program)
     def visit(self, node):

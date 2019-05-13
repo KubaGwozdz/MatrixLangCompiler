@@ -82,7 +82,12 @@ class Interpreter(object):
             for it in my_range:
                 self.memoryStack.set(it_name, it)
                 for instruction in my_instructions:
-                    instruction.accept(self)
+                    try:
+                        instruction.accept(self)
+                    except BreakException:
+                        break
+                    except ContinueException:
+                        pass
             self.memoryStack.delete(it_name)
 
     @when(AST.AssTabInstr)

@@ -169,8 +169,10 @@ class TypeChecker(NodeVisitor):
         if state == False:
             print(msg + "in line {}.".format(node.line))
         self.visit(node.instr1, table)
+        node.instr1.setParent(node)
         if node.instr2 is not None:
             self.visit(node.instr2, table)
+            node.instr2.setParent(node)
 
     def visit_WhileInstr(self, node, table):
         state, msg = self.visit(node.cond, table)

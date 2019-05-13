@@ -78,7 +78,11 @@ class Interpreter(object):
         else:
             it_name = node.id.name
             self.memoryStack.insert(it_name, 0)
-            my_instructions = node.instr.instructions
+            my_instructions = []
+            if hasattr(node.instr, "instructions"):
+                my_instructions = node.instr.instructions
+            else:
+                my_instructions.append(node.instr)
             for it in my_range:
                 self.memoryStack.set(it_name, it)
                 for instruction in my_instructions:

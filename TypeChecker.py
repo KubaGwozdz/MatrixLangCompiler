@@ -168,18 +168,26 @@ class TypeChecker(NodeVisitor):
         state, msg = self.visit(node.cond, table)
         if state == False:
             print(msg + "in line {}.".format(node.line))
+        if isinstance(node.instr1, AST.InstructionList):
+            for child in node.instr1.instructions:
+                child.setParent(node)
+        else:
+            node.instr1.setParent(node)
         self.visit(node.instr1, table)
-        node.instr1.setParent(node)
         if node.instr2 is not None:
+            if isinstance(node.instr2, AST.InstructionList):
+                for child in node.instr2.instructions:
+                    child.setParent(node)
+            else:
+                node.instr2.setParent(node)
             self.visit(node.instr2, table)
-            node.instr2.setParent(node)
 
     def visit_WhileInstr(self, node, table):
         state, msg = self.visit(node.cond, table)
         if state == False:
             print(msg + "in line {}.".format(node.line))
-        if type(node.instr) == list:
-            for child in node.instr:
+        if isinstance(node.instr, AST.InstructionList):
+            for child in node.instr.instructions:
                 child.setParent(node)
         else:
             node.instr.setParent(node)
@@ -196,8 +204,8 @@ class TypeChecker(NodeVisitor):
         else:
             table.put(node.id.name, VariableSymbol(node.id.name, range_t))
             temp_var = True
-        if type(node.instr) == list:
-            for child in node.instr:
+        if isinstance(node.instr, AST.InstructionList):
+            for child in node.instr.instructions:
                 child.setParent(node)
         else:
             node.instr.setParent(node)

@@ -4,8 +4,10 @@ class ReturnValueException(Exception):
 
 
 class BreakException(Exception):
+    print("BREAK EXCEPTION")
     pass
 
 
 class ContinueException(Exception):
+    print("CONTINUE EXCEPTION")
     pass

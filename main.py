@@ -5,13 +5,14 @@ import ply.yacc as yacc
 from Mparser import Mparser
 from TreePrinter import TreePrinter
 from TypeChecker import TypeChecker
+from Interpreter import Interpreter
 
 
 
 if __name__ == '__main__':
 
     try:
-        filename = sys.argv[1] if len(sys.argv) > 1 else "examples/example4.txt"
+        filename = sys.argv[1] if len(sys.argv) > 1 else "examples/example6.txt"
         file = open(filename, "r")
     except IOError:
         print("Cannot open {0} file".format(filename))
@@ -23,6 +24,10 @@ if __name__ == '__main__':
     ast = parser.parse(text, lexer=Mparser.scanner)
     typeChecker = TypeChecker()
     typeChecker.visit(ast)
-    print(typeChecker.isValid)
+    if typeChecker.isValid:
+        print("interpreting...")
+        ast.accept(Interpreter())
+    else:
+        print("Errors found..")
 
 

@@ -45,10 +45,6 @@ class TreePrinter:
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + self.op + "\n" + self.left.printTree(indent + 1) + self.right.printTree(indent + 1)
 
-    @addToClass(AST.RelExpr)
-    def printTree(self, indent=0):
-        return INDENT_TOKEN * indent + self.op + "\n" + self.left.printTree(indent + 1) + self.right.printTree(indent + 1)
-
     @addToClass(AST.NegatedExpr)
     def printTree(self, indent=0):
         return INDENT_TOKEN * indent + "-\n" + self.expr.printTree(indent + 1)

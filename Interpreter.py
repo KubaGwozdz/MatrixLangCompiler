@@ -43,14 +43,12 @@ class Interpreter(object):
     def visit(self,node):
         return 0
 
-    
-
 
     @when(AST.AssInstr)
     def visit(self, node):
-        return 0
-    #
-    #
+        expr_accept = node.right.accept(self)
+        self.memoryStack.set(node.left, expr_accept)
+        return expr_accept
 
     # simplistic while loop interpretation
     @when(AST.WhileInstr)

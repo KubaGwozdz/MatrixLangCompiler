@@ -50,3 +50,15 @@ class Interpreter(object):
     def visit(self, node):
         value = node.expression.accept(self)
         raise ReturnValueException(value)
+
+    @when(AST.Program)
+    def visit(self, node):
+        node.instructions.accept(self)
+
+    @when(AST.InstructionList)
+    def visit(self, node):
+        for instruction in node.instructions:
+            instruction.accept(self)
+
+
+

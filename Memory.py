@@ -28,9 +28,9 @@ class MemoryStack:
         else:
             self.stack.append(Memory("toplevel"))
 
-    def get(self, name):             # get from memory stack current value of variable <name>
-        indices = range(len(self.stack))
-        indices.reverse()
+    def get(self, name):
+    # get from memory stack current value of variable <name>
+        indices = reversed(range(len(self.stack)))
         for i in indices:
             if self.stack[i].has_key(name):
                 return self.stack[i].get(name)
@@ -43,14 +43,13 @@ class MemoryStack:
     def set(self, name, value):
     # sets variable <name> to value <value>
         indices = reversed(range(len(self.stack)))
-        #indices.reverse()
         for i in indices:
             if self.stack[i].has_key(name):
                 self.stack[i].put(name, value)
                 break
 
     def push(self, memory):
-    # push memory <memory> onto the stack
+    # pushes memory <memory> onto the stack
         self.stack.append(memory)
 
     def pop(self):

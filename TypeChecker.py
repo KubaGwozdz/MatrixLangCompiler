@@ -32,6 +32,7 @@ for op in ['+','*']:
     ttype[op]['matrix']['int'] = 'matrix'
     ttype[op]['matrix']['float'] = 'matrix'
     ttype[op]['int']['matrix'] = 'matrix'
+    ttype[op]['float']['matrix'] = 'matrix'
 
 
 
@@ -131,12 +132,20 @@ class TypeChecker(NodeVisitor):
             print("Trying to modify unknown matrix: {} in line {}.".format(node.left, node.left.line))
         else:
             row, column = table.getMatrixSize(node.left.name)
-            if node.frm.value >= row.value:
-                self.isValid = False
-                print("Row out of matrix bounds: line {}".format(node.left.line))
-            if node.to.value >= column.value:
-                self.isValid = False
-                print("Column out of matrix bounds: line {}".format(node.left.line))
+            if isinstance(row,int):
+                if node.frm.value >= row:
+                    self.isValid = False
+                    print("Row out of matrix bounds: line {}".format(node.left.line))
+                if node.to.value >= column:
+                    self.isValid = False
+                    print("Column out of matrix bounds: line {}".format(node.left.line))
+            else:
+                if node.frm.value >= row.value:
+                    self.isValid = False
+                    print("Row out of matrix bounds: line {}".format(node.left.line))
+                if node.to.value >= column.value:
+                    self.isValid = False
+                    print("Column out of matrix bounds: line {}".format(node.left.line))
 
     def visit_RangeInstr(self, node, table):
         frm_t = self.visit(node.frm, table)

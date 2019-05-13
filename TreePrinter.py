@@ -51,9 +51,9 @@ class TreePrinter:
 
     @addToClass(AST.AssInstr)
     def printTree(self, indent=0):
-        return INDENT_TOKEN * indent + self.op + "\n" + \
-               INDENT_TOKEN * (indent + 1) + self.left.printTree(indent )  \
-               + self.right.printTree(indent + 1)
+        return INDENT_TOKEN * indent + self.op + "\n" \
+               + self.left.printTree(indent+1)  \
+               + self.right.printTree(indent+1)
 
     @addToClass(AST.AssTabInstr)
     def printTree(self, indent=0):
@@ -163,8 +163,7 @@ class TreePrinter:
     def printTree(self, indent=0):
         return self.instructions.printTree(indent)
 
-"""
-    @addToClass(AST.Error)
+    '''@addToClass(AST.Error)
     def printTree(self, indent=0):
-        return INDENT_TOKEN * indent + "Syntax error at line" + str(self.lineno) + str(self.type) + " " + str(self.value) + "\n\n"
-"""
+        return INDENT_TOKEN * indent + "Syntax error at line " + str(self.lineno) + " : LexToken(" + str(self.type) + ", '" + str(self.value) + "')\n"
+'''

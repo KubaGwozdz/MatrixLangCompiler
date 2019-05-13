@@ -2,6 +2,7 @@ import inspect
 
 __all__ = ['on', 'when']
 
+
 def on(param_name):
   def f(fn):
     dispatcher = Dispatcher(param_name, fn)

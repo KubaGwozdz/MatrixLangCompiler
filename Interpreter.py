@@ -41,14 +41,19 @@ class Interpreter(object):
 
     @when(AST.NegatedExpr)
     def visit(self,node):
-        return 0
-
+        val = node.expr.accept(self)
+        return eval("-" + val)
 
     @when(AST.AssInstr)
     def visit(self, node):
         expr_accept = node.right.accept(self)
+        self.memoryStack.insert(node.left.name, expr_accept)
         self.memoryStack.set(node.left, expr_accept)
         return expr_accept
+
+    @when(AST.AssTabInstr)
+    def visit(self,node):
+        return 0
 
     # simplistic while loop interpretation
     @when(AST.WhileInstr)

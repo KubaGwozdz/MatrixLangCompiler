@@ -28,8 +28,8 @@ class Mparser(object):
 
     def p_error(self, p):
         if p:
-            print("Syntax error at line {0} : LexToken({1}, '{2}')".format(p.lineno, p.type, p.value))
-            #p[0] = AST.Error(p.lineno, p.type, p.value)
+            print("Syntax error at line {0} : LexToken({1}, '{2}')\n".format(p.lineno, p.type, p.value))
+            #p[0] = AST.Error(p.lineno, p.type, p.value) TODO: zapytac o blad...
         else:
             print("Unexpected end of input")
             #p[0] = AST.Error
@@ -43,7 +43,10 @@ class Mparser(object):
     def p_instructions_opt(self, p):
         """instructions_opt : instructions
                             | """
-        p[0] = p[1]
+        if len(p) == 2:
+            p[0] = p[1]
+        else:
+            print("File empty")
 
     def p_instructions(self, p):
         """instructions : instructions instruction
@@ -128,11 +131,11 @@ class Mparser(object):
     def p_assignment(self, p):
         """assignment : id assign_ops matrix ';'
                       | id assign_ops expression ';'
-                      | id '[' INTNUM ',' INTNUM ']' assign_ops expression ';' """
+                      | id '[' int ',' int ']' assign_ops expression ';' """
         if(len(p)<6):
             p[0] = AST.AssInstr(p[2], p[1], p[3], p.lineno(1))
         else:
-            p[0] = AST.AssTabInstr(p[7], p[1], AST.IntNum(p[3], p.lineno(1)), AST.IntNum(p[5], p.lineno(1)), p[8], p.lineno(1))
+            p[0] = AST.AssTabInstr(p[7], p[1], p[3], p[5], p[8], p.lineno(1))
 
     def p_assign_ops(self, p):
         """assign_ops : SUBASSIGN
@@ -192,7 +195,7 @@ class Mparser(object):
                        | ones_instr
                        | zeros_instr
                        | eye_instr
-                       | matrix """      #TODO: sprawdzic!!!
+                       | matrix """
         if(len(p) == 4):
             p[0] = AST.BinExpr(p[2], p[1], p[3], p.lineno(1))
         elif(len(p) == 3):

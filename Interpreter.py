@@ -4,6 +4,7 @@ from Memory import *
 from Exceptions import  *
 from visit import *
 import sys
+import copy
 
 sys.setrecursionlimit(10000)
 
@@ -169,7 +170,7 @@ class Interpreter(object):
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
-        result = r1
+        result = copy.deepcopy(r1)
         size = len(r1)
         if node.op == ".+":
             for row in range(size):
@@ -217,7 +218,7 @@ class Interpreter(object):
     def visit(self, node):
         body = []
         size = node.intnum.accept(self)
-        eye = 0;
+        eye = 0
         for row in range(size):
             column = []
             for element in range(size):

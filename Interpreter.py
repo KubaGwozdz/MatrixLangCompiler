@@ -95,15 +95,18 @@ class Interpreter(object):
                 my_instructions = node.instr.instructions
             else:
                 my_instructions.append(node.instr)
+            proceed = True
             for it in my_range:
                 self.memoryStack.set(it_name, it)
-                for instruction in my_instructions:
-                    try:
-                        instruction.accept(self)
-                    except BreakException:
-                        break
-                    except ContinueException:
-                        pass
+                if proceed:
+                    for instruction in my_instructions:
+                        try:
+                            instruction.accept(self)
+                        except BreakException:
+                            proceed = False
+                            break
+                        except ContinueException:
+                            pass
             self.memoryStack.delete(it_name)
 
     @when(AST.AssTabInstr)
@@ -177,35 +180,46 @@ class Interpreter(object):
 
     @when(AST.MatrixTransp)
     def visit(self, node):
-        return node.matrix
+        matrix = node.matrix.accept(self)
+        result = copy.deepcopy(matrix)
+        size = len(matrix)
+        for row in range(size):
+            for column in range(size):
+                result[row][column] = matrix[column][row]
+        return result
+
 
     @when(AST.Matrix_bin_ops)
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
         result = copy.deepcopy(r1)
-        size = len(r1)
+        r_size = len(r1)
+        c_size = len(r1[0])
         if node.op == ".+":
-            for row in range(size):
-                for col in range(size):
+            for row in range(r_size):
+                for col in range(c_size):
                     result[row][col].value += r2[row][col].accept(self)
             return result
         elif node.op == ".-":
-            for row in range(size):
-                for col in range(size):
-                    result[row][col].value -= r2[row][col].value
+            for row in range(r_size):
+                for col in range(c_size):
+                    result[row][col].value -= r2[row][col].accept(self)
             return result
         elif node.op == ".*":
-            for row in range(size):
-                for col in range(size):
-                    result[row][col].value = 0
-            for row in range(size):
-                for col in range(size):
-                    result[row][col].value += r1[row][col].value * r2[col][row].value
+            result = []
+            for row in range(r_size):
+                result.append([])
+                for col in range(r_size):
+                    result[row].append(AST.IntNum(0,0))
+            for row in range(r_size):
+                for col in range(r_size):
+                    for el in range(c_size):
+                        result[row][col].value += r1[row][el].accept(self) * r2[el][col].accept(self)
             return result
         elif node.op == "./":
-            for row in range(size):
-                for col in range(size):
+            for row in range(r_size):
+                for col in range(c_size):
                     result[row][col].value /= r2[row][col].accept(self)
             return result
 

@@ -37,22 +37,7 @@ class Interpreter(object):
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
-        if node.op == "+=":
-            r1 += r2
-            return r1
-        elif node.op == "-=":
-            r1 -= r2
-            return r1
-        elif node.op == "*=":
-            r1 += r2
-            return r1
-        elif node.op == "/=":
-            r1 += r2
-        elif node.op == "=":
-            r1 = r2
-            return r1
-        else:
-            return eval("a" + node.op + "b", {"a": r1, "b": r2})
+        return eval("a" + node.op + "b", {"a": r1, "b": r2})
 
     @when(AST.NegatedExpr)
     def visit(self,node):
@@ -61,9 +46,22 @@ class Interpreter(object):
 
     @when(AST.AssInstr)
     def visit(self, node):
-        expr_accept = node.right.accept(self)
-        self.memoryStack.insert(node.left.name, expr_accept)
-        return expr_accept
+        r_val = node.right.accept(self)
+        if node.op == "=":
+            self.memoryStack.insert(node.left.name, r_val)
+            return r_val
+        else:
+            val = node.left.accept(self)
+            if node.op == "-=":
+                val -= r_val
+            elif node.op == "*=":
+                val *= r_val
+            elif node.op == "/=":
+                val /= r_val
+            elif node.op == "+=":
+                val += r_val
+            self.memoryStack.set(node.left.name, val)
+            return val
 
     @when(AST.RangeInstr)
     def visit(self, node):
@@ -139,6 +137,7 @@ class Interpreter(object):
                     for val in row:
                         print(str(val.accept(self)), end=', ')
                     print()
+                print()
             else:
                 print(ex)
 
@@ -154,6 +153,9 @@ class Interpreter(object):
     def visit(self, node):
         value = node.expression.accept(self)
         raise ReturnValueException(value)
+
+
+# ------------  Matrix  ------------
 
     @when(AST.Matrix)
     def visit(self,node):
@@ -171,7 +173,7 @@ class Interpreter(object):
         if node.op == ".+":
             for row in r2:
                 for col in row:
-                    r3[row][col] += r2[row][col] #?
+                    r3[row][col].value += r2[row][col].accept(self) #?
             return r3
         elif node.op == ".-":
             for row in r2:
@@ -191,6 +193,40 @@ class Interpreter(object):
         else:
             return eval("a" + node.op + "b", {"a": r1, "b": r2})
 
+
+    @when(AST.ZerosInstr)
+    def visit(self, node):
+        body = []
+        size = node.intnum.accept(self)
+        for row in range(size):
+            column = [AST.IntNum(0, 0) for x in range(size)]
+            body.append(column)
+        return body
+
+    @when(AST.OnesInstr)
+    def visit(self, node):
+        body = []
+        size = node.intnum.accept(self)
+        for row in range(size):
+            column = [AST.IntNum(1, 0) for x in range(size)]
+            body.append(column)
+        return body
+
+    @when(AST.EyeInstr)
+    def visit(self, node):
+        body = []
+        size = node.intnum.accept(self)
+        eye = 0;
+        for row in range(size):
+            column = []
+            for element in range(size):
+                if element == eye:
+                    column.append(AST.IntNum(1,0))
+                else:
+                    column.append((AST.IntNum(0,0)))
+            eye += 1
+            body.append(column)
+        return body
 
     @when(AST.Program)
     def visit(self, node):

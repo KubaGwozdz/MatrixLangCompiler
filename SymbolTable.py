@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import AST
 
 
 class Symbol:
@@ -56,7 +57,7 @@ class SymbolTable(object):
             matrix = self.symbols[name]
             row = matrix.row
             column = matrix.column
-            return row,column
+            return AST.IntNum(row,matrix.line), column
         except:
             return None
 

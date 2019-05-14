@@ -267,8 +267,12 @@ class Mparser(object):
 
     def p_number(self, p):
         """NUMBER : int
+                  | '-' NUMBER %prec UMINUS
                   | float"""
-        p[0] = p[1]
+        if len(p) == 3:
+            p[0] = AST.NegatedExpr(p[2])
+        else:
+            p[0] = p[1]
 
     #------ matrix operations: ------
 

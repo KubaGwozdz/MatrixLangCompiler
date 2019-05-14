@@ -118,7 +118,7 @@ class TypeChecker(NodeVisitor):
                         print("Matrix assign error in line {}".format(node.left.line))
                         self.isValid = False
                 else:
-                    table.put(node.left.name, MatrixSymbol(node.left.name, r_type, node.right.intnum, node.right.intnum))
+                    table.put(node.left.name, MatrixSymbol(node.left.name, r_type, node.right.intnum.value, node.right.intnum.value))
             else:
                 table.put(node.left.name, VariableSymbol(node.left.name, r_type))
         elif r_type != definition or (definition != "float" and definition != "int" and definition != "string" and definition != "matrix"):

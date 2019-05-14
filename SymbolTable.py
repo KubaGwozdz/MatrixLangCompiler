@@ -57,7 +57,7 @@ class SymbolTable(object):
             matrix = self.symbols[name]
             row = matrix.row
             column = matrix.column
-            return AST.IntNum(row,matrix.line), column
+            return row, column
         except:
             return None
 

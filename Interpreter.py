@@ -39,16 +39,16 @@ class Interpreter(object):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
         if isinstance(r1,list):
-            r3 = r1
+            r3 = copy.deepcopy(r1)
             for i in range(len(r1)):
                 for j in range(len(r1[0])):
-                    r3[i][j] = AST.IntNum(eval("a" + node.op + "b", {"a": r1[i][j].value, "b": r2}),node.line)
+                    r3[i][j] = AST.IntNum(eval("a" + node.op + "b", {"a": r1[i][j].accept(self), "b": r2}),node.line)
             return r3
         elif isinstance(r2,list):
             r3 = r2
             for i in range(len(r2)):
                 for j in range(len(r2[0])):
-                    r3[i][j] = AST.IntNum(eval("a" + node.op + "b", {"a": r1, "b": r2[i][j].value}),node.line)
+                    r3[i][j] = AST.IntNum(eval("a" + node.op + "b", {"a": r1, "b": r2[i][j].accept(self)}),node.line)
             return r3
         else:
             return eval("a" + node.op + "b", {"a": r1, "b": r2})
@@ -62,7 +62,7 @@ class Interpreter(object):
     def visit(self, node):
         r_val = node.right.accept(self)
         if node.op == "=":
-            self.memoryStack.insert(node.left.name, r_val)
+            self.memoryStack.insert(node.left.name, copy.deepcopy(r_val))
             return r_val
         else:
             val = node.left.accept(self)
@@ -113,9 +113,9 @@ class Interpreter(object):
         row = node.frm.accept(self)
         col = node.to.accept(self)
         line = matrix[row][col].line
-        if isinstance(matrix[row][col].value,int):
+        if isinstance(matrix[row][col].accept(self),int):
             matrix[row][col] = AST.IntNum(expr_accept,line)
-        elif isinstance(matrix[row][col].value, float):
+        elif isinstance(matrix[row][col].accept(self), float):
             matrix[row][col] = AST.FloatNum(expr_accept, line)
         self.memoryStack.insert(node.left.name, expr_accept)
         self.memoryStack.set(node.left.name, matrix)

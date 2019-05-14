@@ -169,30 +169,31 @@ class Interpreter(object):
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
-        r3 = r1
+        result = r1
+        size = len(r1)
         if node.op == ".+":
-            for row in r2:
-                for col in row:
-                    r3[row][col].value += r2[row][col].accept(self) #?
-            return r3
+            for row in range(size):
+                for col in range(size):
+                    result[row][col].value += r2[row][col].accept(self) #?
+            return result
         elif node.op == ".-":
-            for row in r2:
-                for col in row:
-                    r3[row][col].value -= r2[row][col].value
-            return r3
+            for row in range(size):
+                for col in range(size):
+                    result[row][col].value -= r2[row][col].value
+            return result
         elif node.op == ".*":
-            for row in r3:
-                for col in r3:
-                    r3[row][col].value = 0
-            for row in r1:
-                for col in r1:
-                    r3[row][col].value += r1[row][col].value * r2[col][row].value
-            return r3
+            for row in range(size):
+                for col in range(size):
+                    result[row][col].value = 0
+            for row in range(size):
+                for col in range(size):
+                    result[row][col].value += r1[row][col].value * r2[col][row].value
+            return result
         elif node.op == "./":
-            r1 += r2
-        else:
-            return eval("a" + node.op + "b", {"a": r1, "b": r2})
-
+            for row in range(size):
+                for col in range(size):
+                    result[row][col].value /= r2[row][col].accept(self)
+            return result
 
     @when(AST.ZerosInstr)
     def visit(self, node):

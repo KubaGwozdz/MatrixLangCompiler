@@ -38,7 +38,20 @@ class Interpreter(object):
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
-        return eval("a" + node.op + "b", {"a": r1, "b": r2})
+        if isinstance(r1,list):
+            r3 = r1
+            for i in range(len(r1)):
+                for j in range(len(r1[0])):
+                    r3[i][j] = AST.IntNum(eval("a" + node.op + "b", {"a": r1[i][j].value, "b": r2}),node.line)
+            return r3
+        elif isinstance(r2,list):
+            r3 = r2
+            for i in range(len(r2)):
+                for j in range(len(r2[0])):
+                    r3[i][j] = AST.IntNum(eval("a" + node.op + "b", {"a": r1, "b": r2[i][j].value}),node.line)
+            return r3
+        else:
+            return eval("a" + node.op + "b", {"a": r1, "b": r2})
 
     @when(AST.NegatedExpr)
     def visit(self,node):
@@ -175,7 +188,7 @@ class Interpreter(object):
         if node.op == ".+":
             for row in range(size):
                 for col in range(size):
-                    result[row][col].value += r2[row][col].accept(self) #?
+                    result[row][col].value += r2[row][col].accept(self)
             return result
         elif node.op == ".-":
             for row in range(size):

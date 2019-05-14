@@ -28,12 +28,11 @@ for op in ['<', '>', '<=', '>=', '==', '!=']:
 for op in ['.+','.-','./','.*']:
     ttype[op]['matrix']['matrix'] = 'matrix'
 
-for op in ['+','*']:
+for op in ['*']:
     ttype[op]['matrix']['int'] = 'matrix'
     ttype[op]['matrix']['float'] = 'matrix'
     ttype[op]['int']['matrix'] = 'matrix'
     ttype[op]['float']['matrix'] = 'matrix'
-
 
 
 class NodeVisitor(object):

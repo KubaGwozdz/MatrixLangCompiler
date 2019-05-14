@@ -133,7 +133,14 @@ class Interpreter(object):
     @when(AST.PrintInstr)
     def visit(self, node):
         for expr in node.expr:
-            print(expr.accept(self))
+            ex = expr.accept(self)
+            if type(ex) == list:
+                for row in ex:
+                    for val in row:
+                        print(str(val.accept(self)), end=', ')
+                    print()
+            else:
+                print(ex)
 
     @when(AST.BreakInstr)
     def visit(self, node):
